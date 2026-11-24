@@ -1,0 +1,667 @@
+{
+  "gifts": [
+    {
+      "id": "323ebacf-9754-42b7-81b7-af01bb2007b9",
+      "note": "",
+      "type": "bank",
+      "address": "",
+      "enabled": true,
+      "provider": "[Nama Bank]",
+      "sort_order": 0,
+      "logo_media_id": null,
+      "qris_media_id": null,
+      "account_holder": "[Nama Pemilik Rekening]",
+      "account_number": "[Nomor Rekening]"
+    },
+    {
+      "id": "7a175572-bca0-4408-92e1-587576c627dc",
+      "note": "",
+      "type": "ewallet",
+      "address": "",
+      "enabled": true,
+      "provider": "[Nama E-Wallet]",
+      "sort_order": 1,
+      "logo_media_id": null,
+      "qris_media_id": null,
+      "account_holder": "[Nama Pemilik]",
+      "account_number": "[Nomor E-Wallet]"
+    },
+    {
+      "id": "b67d8a8f-b933-4304-8608-1d23af7ef302",
+      "note": "",
+      "type": "address",
+      "address": "[Alamat Pengiriman Hadiah]",
+      "enabled": true,
+      "provider": "Kirim Hadiah",
+      "sort_order": 2,
+      "logo_media_id": null,
+      "qris_media_id": null,
+      "account_holder": "[Nama Penerima]",
+      "account_number": ""
+    }
+  ],
+  "media": {
+    "00000000-0000-4000-8000-0000000000a1": {
+      "id": "00000000-0000-4000-8000-0000000000a1",
+      "alt": "Placeholder foto utama pasangan",
+      "url": "/placeholders/cover.svg",
+      "kind": "image",
+      "width": 1200,
+      "height": 1800,
+      "focal_x": 50,
+      "focal_y": 40,
+      "mime_type": "image/svg+xml",
+      "created_at": "2026-11-24T08:25:37.526+00:00",
+      "size_bytes": null,
+      "storage_path": null
+    },
+    "00000000-0000-4000-8000-0000000000a2": {
+      "id": "00000000-0000-4000-8000-0000000000a2",
+      "alt": "Placeholder foto pasangan untuk hero",
+      "url": "/placeholders/hero.svg",
+      "kind": "image",
+      "width": 1600,
+      "height": 2000,
+      "focal_x": 50,
+      "focal_y": 35,
+      "mime_type": "image/svg+xml",
+      "created_at": "2026-11-24T08:25:37.526+00:00",
+      "size_bytes": null,
+      "storage_path": null
+    },
+    "00000000-0000-4000-8000-0000000000a3": {
+      "id": "00000000-0000-4000-8000-0000000000a3",
+      "alt": "Placeholder foto mempelai pertama",
+      "url": "/placeholders/person-1.svg",
+      "kind": "image",
+      "width": 900,
+      "height": 1200,
+      "focal_x": 50,
+      "focal_y": 30,
+      "mime_type": "image/svg+xml",
+      "created_at": "2026-11-24T08:25:37.526+00:00",
+      "size_bytes": null,
+      "storage_path": null
+    },
+    "00000000-0000-4000-8000-0000000000a4": {
+      "id": "00000000-0000-4000-8000-0000000000a4",
+      "alt": "Placeholder foto mempelai kedua",
+      "url": "/placeholders/person-2.svg",
+      "kind": "image",
+      "width": 900,
+      "height": 1200,
+      "focal_x": 50,
+      "focal_y": 30,
+      "mime_type": "image/svg+xml",
+      "created_at": "2026-11-24T08:25:37.526+00:00",
+      "size_bytes": null,
+      "storage_path": null
+    },
+    "00000000-0000-4000-8000-0000000000a5": {
+      "id": "00000000-0000-4000-8000-0000000000a5",
+      "alt": "Placeholder foto venue",
+      "url": "/placeholders/venue.svg",
+      "kind": "image",
+      "width": 1600,
+      "height": 1000,
+      "focal_x": 50,
+      "focal_y": 50,
+      "mime_type": "image/svg+xml",
+      "created_at": "2026-11-24T08:25:37.526+00:00",
+      "size_bytes": null,
+      "storage_path": null
+    },
+    "00000000-0000-4000-8000-0000000000a6": {
+      "id": "00000000-0000-4000-8000-0000000000a6",
+      "alt": "Placeholder foto penutup",
+      "url": "/placeholders/closing.svg",
+      "kind": "image",
+      "width": 1200,
+      "height": 1600,
+      "focal_x": 50,
+      "focal_y": 45,
+      "mime_type": "image/svg+xml",
+      "created_at": "2026-11-24T08:25:37.526+00:00",
+      "size_bytes": null,
+      "storage_path": null
+    },
+    "00000000-0000-4000-8000-0000000000b1": {
+      "id": "00000000-0000-4000-8000-0000000000b1",
+      "alt": "Placeholder galeri 1",
+      "url": "/placeholders/gallery-1.svg",
+      "kind": "image",
+      "width": 1000,
+      "height": 1400,
+      "focal_x": 50,
+      "focal_y": 50,
+      "mime_type": "image/svg+xml",
+      "created_at": "2026-11-24T08:25:37.526+00:00",
+      "size_bytes": null,
+      "storage_path": null
+    },
+    "00000000-0000-4000-8000-0000000000b2": {
+      "id": "00000000-0000-4000-8000-0000000000b2",
+      "alt": "Placeholder galeri 2",
+      "url": "/placeholders/gallery-2.svg",
+      "kind": "image",
+      "width": 1400,
+      "height": 1000,
+      "focal_x": 50,
+      "focal_y": 50,
+      "mime_type": "image/svg+xml",
+      "created_at": "2026-11-24T08:25:37.526+00:00",
+      "size_bytes": null,
+      "storage_path": null
+    },
+    "00000000-0000-4000-8000-0000000000b3": {
+      "id": "00000000-0000-4000-8000-0000000000b3",
+      "alt": "Placeholder galeri 3",
+      "url": "/placeholders/gallery-3.svg",
+      "kind": "image",
+      "width": 1000,
+      "height": 1000,
+      "focal_x": 50,
+      "focal_y": 50,
+      "mime_type": "image/svg+xml",
+      "created_at": "2026-11-24T08:25:37.526+00:00",
+      "size_bytes": null,
+      "storage_path": null
+    },
+    "00000000-0000-4000-8000-0000000000b4": {
+      "id": "00000000-0000-4000-8000-0000000000b4",
+      "alt": "Placeholder galeri 4",
+      "url": "/placeholders/gallery-4.svg",
+      "kind": "image",
+      "width": 1000,
+      "height": 1500,
+      "focal_x": 50,
+      "focal_y": 50,
+      "mime_type": "image/svg+xml",
+      "created_at": "2026-11-24T08:25:37.526+00:00",
+      "size_bytes": null,
+      "storage_path": null
+    },
+    "00000000-0000-4000-8000-0000000000b5": {
+      "id": "00000000-0000-4000-8000-0000000000b5",
+      "alt": "Placeholder galeri 5",
+      "url": "/placeholders/gallery-5.svg",
+      "kind": "image",
+      "width": 1500,
+      "height": 1000,
+      "focal_x": 50,
+      "focal_y": 50,
+      "mime_type": "image/svg+xml",
+      "created_at": "2026-11-24T08:25:37.526+00:00",
+      "size_bytes": null,
+      "storage_path": null
+    },
+    "00000000-0000-4000-8000-0000000000b6": {
+      "id": "00000000-0000-4000-8000-0000000000b6",
+      "alt": "Placeholder galeri 6",
+      "url": "/placeholders/gallery-6.svg",
+      "kind": "image",
+      "width": 1000,
+      "height": 1300,
+      "focal_x": 50,
+      "focal_y": 50,
+      "mime_type": "image/svg+xml",
+      "created_at": "2026-11-24T08:25:37.526+00:00",
+      "size_bytes": null,
+      "storage_path": null
+    },
+    "00000000-0000-4000-8000-0000000000b7": {
+      "id": "00000000-0000-4000-8000-0000000000b7",
+      "alt": "Placeholder galeri 7",
+      "url": "/placeholders/gallery-7.svg",
+      "kind": "image",
+      "width": 1000,
+      "height": 1400,
+      "focal_x": 50,
+      "focal_y": 50,
+      "mime_type": "image/svg+xml",
+      "created_at": "2026-11-24T08:25:37.526+00:00",
+      "size_bytes": null,
+      "storage_path": null
+    },
+    "00000000-0000-4000-8000-0000000000b8": {
+      "id": "00000000-0000-4000-8000-0000000000b8",
+      "alt": "Placeholder galeri 8",
+      "url": "/placeholders/gallery-8.svg",
+      "kind": "image",
+      "width": 1400,
+      "height": 1000,
+      "focal_x": 50,
+      "focal_y": 50,
+      "mime_type": "image/svg+xml",
+      "created_at": "2026-11-24T08:25:37.526+00:00",
+      "size_bytes": null,
+      "storage_path": null
+    }
+  },
+  "events": [
+    {
+      "id": "1e40d97a-f1e6-45b7-82d2-90f253da275e",
+      "notes": "Acara akad dihadiri keluarga inti dan kerabat dekat.",
+      "title": "Akad Nikah",
+      "address": "[Alamat Venue]",
+      "end_time": "10:00:00",
+      "maps_url": "",
+      "time_note": "",
+      "dress_code": "",
+      "event_date": "2027-06-12",
+      "sort_order": 0,
+      "start_time": "08:00:00",
+      "venue_name": "[Nama Venue]"
+    },
+    {
+      "id": "e60931a7-9800-4561-989f-5d7bcfe8055e",
+      "notes": "",
+      "title": "Resepsi Pernikahan",
+      "address": "[Alamat Venue]",
+      "end_time": "14:00:00",
+      "maps_url": "",
+      "time_note": "",
+      "dress_code": "",
+      "event_date": "2027-06-12",
+      "sort_order": 1,
+      "start_time": "11:00:00",
+      "venue_name": "[Nama Venue]"
+    }
+  ],
+  "gallery": [
+    {
+      "id": "aee895c8-5fb1-4c6c-a7e4-9931ad8f998f",
+      "layout": "tall",
+      "caption": "",
+      "media_id": "00000000-0000-4000-8000-0000000000b1",
+      "sort_order": 0
+    },
+    {
+      "id": "73362a52-444b-4d0f-b482-35996d93ebb3",
+      "layout": "wide",
+      "caption": "",
+      "media_id": "00000000-0000-4000-8000-0000000000b2",
+      "sort_order": 1
+    },
+    {
+      "id": "ae36e460-aaf9-4422-a6db-22d6a1a28fb6",
+      "layout": "auto",
+      "caption": "",
+      "media_id": "00000000-0000-4000-8000-0000000000b3",
+      "sort_order": 2
+    },
+    {
+      "id": "f30363ca-c87d-4f4c-8860-641bb8921703",
+      "layout": "tall",
+      "caption": "",
+      "media_id": "00000000-0000-4000-8000-0000000000b4",
+      "sort_order": 3
+    },
+    {
+      "id": "509f282b-1a76-4a1f-8e67-3c22b0340dfe",
+      "layout": "wide",
+      "caption": "",
+      "media_id": "00000000-0000-4000-8000-0000000000b5",
+      "sort_order": 4
+    },
+    {
+      "id": "05c89f8d-1eb3-425b-872d-6507ae21a016",
+      "layout": "auto",
+      "caption": "",
+      "media_id": "00000000-0000-4000-8000-0000000000b6",
+      "sort_order": 5
+    },
+    {
+      "id": "64f10009-77cf-47f6-81ef-5ca6d77017ff",
+      "layout": "auto",
+      "caption": "",
+      "media_id": "00000000-0000-4000-8000-0000000000b7",
+      "sort_order": 6
+    },
+    {
+      "id": "abd23851-c70a-43ef-8bae-e633242b3806",
+      "layout": "wide",
+      "caption": "",
+      "media_id": "00000000-0000-4000-8000-0000000000b8",
+      "sort_order": 7
+    }
+  ],
+  "stories": [
+    {
+      "id": "d85aadf3-7a2c-41a6-9824-61e3898e806d",
+      "title": "First Meet",
+      "media_id": "00000000-0000-4000-8000-0000000000b3",
+      "date_label": "[Tahun]",
+      "sort_order": 0,
+      "description": "[Ceritakan singkat di mana dan bagaimana kalian pertama bertemu.]"
+    },
+    {
+      "id": "d5ae3571-3e46-475a-93fd-b563c550e809",
+      "title": "Getting Closer",
+      "media_id": null,
+      "date_label": "[Tahun]",
+      "sort_order": 1,
+      "description": "[Momen yang membuat kalian mulai dekat.]"
+    },
+    {
+      "id": "061f63ba-9122-46f8-ac6e-595fb90701e3",
+      "title": "In a Relationship",
+      "media_id": null,
+      "date_label": "[Tahun]",
+      "sort_order": 2,
+      "description": "[Kapan kalian memutuskan untuk bersama.]"
+    },
+    {
+      "id": "1564d82f-987d-4897-b258-b1383c48d813",
+      "title": "The Proposal",
+      "media_id": "00000000-0000-4000-8000-0000000000b5",
+      "date_label": "[Tanggal]",
+      "sort_order": 3,
+      "description": "[Cerita singkat tentang lamaran.]"
+    },
+    {
+      "id": "f5d25965-4ce2-4309-a357-46ce18727a2a",
+      "title": "Engagement",
+      "media_id": null,
+      "date_label": "[Tanggal]",
+      "sort_order": 4,
+      "description": "[Acara pertunangan atau lamaran keluarga.]"
+    },
+    {
+      "id": "0171e58c-0b79-4b1b-86d3-b0e110f8eb98",
+      "title": "Wedding Day",
+      "media_id": null,
+      "date_label": "12 Juni 2027",
+      "sort_order": 5,
+      "description": "[Hari yang kalian nantikan.]"
+    }
+  ],
+  "version": 1,
+  "sections": [
+    {
+      "id": "20bee377-844f-459f-a315-d415857d00e6",
+      "key": "cover",
+      "title": "Opening Cover",
+      "content": {
+        "eyebrow": "The Wedding of",
+        "greeting": "Kepada Yth. Bapak/Ibu/Saudara/i",
+        "media_id": "00000000-0000-4000-8000-0000000000a1",
+        "button_label": "Buka Undangan",
+        "default_guest": "Tamu Undangan"
+      },
+      "enabled": true,
+      "subtitle": "",
+      "background": "primary",
+      "sort_order": 0,
+      "background_media_id": null
+    },
+    {
+      "id": "f5af3422-22c7-402d-ba5b-6d3154fa2638",
+      "key": "hero",
+      "title": "Hero",
+      "content": {
+        "tagline": "Dua perjalanan, satu rumah yang sama.",
+        "media_id": "00000000-0000-4000-8000-0000000000a2",
+        "button_label": "Simpan Tanggal"
+      },
+      "enabled": true,
+      "subtitle": "",
+      "background": "background",
+      "sort_order": 1,
+      "background_media_id": null
+    },
+    {
+      "id": "84059bd2-5c5b-4ab9-ae02-f1ad73d40b7b",
+      "key": "quote",
+      "title": "Kutipan",
+      "content": {
+        "text": "Di antara tanda-tanda (kebesaran)-Nya ialah bahwa Dia menciptakan pasangan-pasangan untukmu dari (jenis) dirimu sendiri agar kamu merasa tenteram kepadanya. Dia menjadikan di antaramu rasa cinta dan kasih sayang. Sesungguhnya pada yang demikian itu benar-benar terdapat tanda-tanda (kebesaran Allah) bagi kaum yang berpikir.",
+        "type": "quran",
+        "arabic": "وَمِنْ آيَاتِهِ أَنْ خَلَقَ لَكُم مِّنْ أَنفُسِكُمْ أَزْوَاجًا لِّتَسْكُنُوا إِلَيْهَا وَجَعَلَ بَيْنَكُم مَّوَدَّةً وَرَحْمَةً ۚ إِنَّ فِي ذَٰلِكَ لَآيَاتٍ لِّقَوْمٍ يَتَفَكَّرُونَ",
+        "source": "QS. Ar-Rum: 21"
+      },
+      "enabled": true,
+      "subtitle": "",
+      "background": "surface",
+      "sort_order": 2,
+      "background_media_id": null
+    },
+    {
+      "id": "7bf0d3ac-1565-494d-8561-2b2bec9bbf46",
+      "key": "couple",
+      "title": "Mempelai",
+      "content": {
+        "connector": "&"
+      },
+      "enabled": true,
+      "subtitle": "Dengan memohon rahmat dan ridha Allah SWT, kami bermaksud menyelenggarakan pernikahan kami.",
+      "background": "background",
+      "sort_order": 3,
+      "background_media_id": null
+    },
+    {
+      "id": "8453175e-543d-4962-b05f-8df1d3081bbb",
+      "key": "countdown",
+      "title": "Save the Date",
+      "content": {
+        "after_message": "Our Happily Ever After Begins",
+        "calendar_title": "Pernikahan [Nama Mempelai Pertama] & [Nama Mempelai Kedua]",
+        "duration_hours": 4,
+        "calendar_description": "Undangan pernikahan"
+      },
+      "enabled": true,
+      "subtitle": "Menghitung hari menuju hari bahagia.",
+      "background": "primary",
+      "sort_order": 4,
+      "background_media_id": null
+    },
+    {
+      "id": "337a9e75-d8bd-43a2-bd45-5a910bad3f99",
+      "key": "events",
+      "title": "Rangkaian Acara",
+      "content": {
+        "notes": "",
+        "dress_code": "[Dress code, misalnya: Earth tone, formal]",
+        "guest_rules": ""
+      },
+      "enabled": true,
+      "subtitle": "Merupakan kehormatan bagi kami atas kehadiran Anda.",
+      "background": "surface",
+      "sort_order": 5,
+      "background_media_id": null
+    },
+    {
+      "id": "cae9e9a4-cff6-4089-80bf-00d3f08d5f44",
+      "key": "location",
+      "title": "Lokasi",
+      "content": {
+        "access": "",
+        "address": "[Alamat Venue]",
+        "parking": "",
+        "maps_url": "",
+        "media_id": "00000000-0000-4000-8000-0000000000a5",
+        "show_map": true,
+        "venue_name": "[Nama Venue]"
+      },
+      "enabled": true,
+      "subtitle": "",
+      "background": "background",
+      "sort_order": 6,
+      "background_media_id": null
+    },
+    {
+      "id": "308a054f-2975-4f81-adae-d38fe98ee32b",
+      "key": "story",
+      "title": "Our Love Story",
+      "content": {},
+      "enabled": true,
+      "subtitle": "Perjalanan kecil yang membawa kami ke hari ini.",
+      "background": "secondary",
+      "sort_order": 7,
+      "background_media_id": null
+    },
+    {
+      "id": "d9e3b1bd-a5dd-424d-ae21-53684cafa9f1",
+      "key": "gallery",
+      "title": "Galeri",
+      "content": {
+        "video_type": "none",
+        "youtube_url": "",
+        "video_media_id": null,
+        "video_poster_id": null
+      },
+      "enabled": true,
+      "subtitle": "Potongan cerita dalam bingkai.",
+      "background": "background",
+      "sort_order": 8,
+      "background_media_id": null
+    },
+    {
+      "id": "97481eb5-b7fa-4cf8-9db1-af13565224bb",
+      "key": "rsvp",
+      "title": "Konfirmasi Kehadiran",
+      "content": {
+        "closed_message": "Konfirmasi kehadiran sudah ditutup. Terima kasih atas perhatian Anda.",
+        "success_message": "Terima kasih, konfirmasi Anda sudah kami terima."
+      },
+      "enabled": true,
+      "subtitle": "Mohon kabari kami sebelum batas waktu konfirmasi.",
+      "background": "surface",
+      "sort_order": 9,
+      "background_media_id": null
+    },
+    {
+      "id": "ed82d41e-a3a5-4610-bcdc-6f34ff082f8a",
+      "key": "wishes",
+      "title": "Ucapan & Doa",
+      "content": {
+        "page_size": 6,
+        "pending_message": "Terima kasih. Ucapan Anda akan tampil setelah ditinjau."
+      },
+      "enabled": true,
+      "subtitle": "Tuliskan doa dan ucapan untuk kami.",
+      "background": "background",
+      "sort_order": 10,
+      "background_media_id": null
+    },
+    {
+      "id": "b6879422-beee-4138-a6a8-53652c52d682",
+      "key": "gift",
+      "title": "Wedding Gift",
+      "content": {},
+      "enabled": true,
+      "subtitle": "Doa restu Anda adalah hadiah terindah bagi kami. Namun apabila Anda ingin memberikan tanda kasih, kami menyediakan pilihan berikut.",
+      "background": "secondary",
+      "sort_order": 11,
+      "background_media_id": null
+    },
+    {
+      "id": "fb8da8a5-a074-47c9-a381-cb29ff14591e",
+      "key": "livestream",
+      "title": "Siaran Langsung",
+      "content": {
+        "url": "",
+        "platform": "youtube",
+        "schedule": "",
+        "description": "",
+        "button_label": "Tonton Siaran"
+      },
+      "enabled": false,
+      "subtitle": "Bagi yang berhalangan hadir, Anda tetap dapat menyaksikan akad kami secara daring.",
+      "background": "surface",
+      "sort_order": 12,
+      "background_media_id": null
+    },
+    {
+      "id": "ac7dc31a-5913-4718-93ed-f09cfb796e1f",
+      "key": "hashtag",
+      "title": "Bagikan Momen",
+      "content": {
+        "hashtag": "#[TagarPernikahan]",
+        "instagram_url": ""
+      },
+      "enabled": true,
+      "subtitle": "Gunakan tagar ini saat membagikan foto di hari bahagia kami.",
+      "background": "background",
+      "sort_order": 13,
+      "background_media_id": null
+    },
+    {
+      "id": "33980dd6-4d20-45c0-8b97-820e3a621472",
+      "key": "closing",
+      "title": "Terima Kasih",
+      "content": {
+        "message": "Merupakan suatu kebahagiaan dan kehormatan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu.",
+        "media_id": "00000000-0000-4000-8000-0000000000a6",
+        "signature": "Kami yang berbahagia"
+      },
+      "enabled": true,
+      "subtitle": "",
+      "background": "primary",
+      "sort_order": 14,
+      "background_media_id": null
+    }
+  ],
+  "settings": {
+    "theme": {
+      "fonts": {
+        "body": "DM Sans",
+        "accent": "Pinyon Script",
+        "heading": "Cormorant Garamond"
+      },
+      "colors": {
+        "text": "#292929",
+        "accent": "#B49A73",
+        "primary": "#454B40",
+        "surface": "#FFFFFF",
+        "secondary": "#E7D8C5",
+        "background": "#FAF8F3"
+      },
+      "radius": 2,
+      "overlay": 0.42,
+      "navStyle": "floating",
+      "animation": "normal",
+      "fontScale": 1,
+      "buttonStyle": "solid"
+    },
+    "couple": {
+      "first": {
+        "bio": "",
+        "parents": "Bapak [Nama Ayah] & Ibu [Nama Ibu]",
+        "nickname": "[Pertama]",
+        "photo_id": "00000000-0000-4000-8000-0000000000a3",
+        "full_name": "[Nama Mempelai Pertama]",
+        "instagram": "",
+        "parent_label": "Putra dari"
+      },
+      "order": "first_second",
+      "second": {
+        "bio": "",
+        "parents": "Bapak [Nama Ayah] & Ibu [Nama Ibu]",
+        "nickname": "[Kedua]",
+        "photo_id": "00000000-0000-4000-8000-0000000000a4",
+        "full_name": "[Nama Mempelai Kedua]",
+        "instagram": "",
+        "parent_label": "Putri dari"
+      }
+    },
+    "noindex": true,
+    "language": "id",
+    "timezone": "Asia/Jakarta",
+    "site_name": "Undangan Pernikahan",
+    "site_title": "The Wedding of [Nama Mempelai Pertama] & [Nama Mempelai Kedua]",
+    "theme_slug": "modern-elegant",
+    "og_media_id": null,
+    "music_volume": 0.45,
+    "rsvp_max_pax": 2,
+    "wedding_date": "2027-06-12T01:00:00+00:00",
+    "logo_media_id": null,
+    "monogram_text": "",
+    "music_enabled": false,
+    "rsvp_deadline": "2027-06-01T16:59:00+00:00",
+    "music_media_id": null,
+    "favicon_media_id": null,
+    "meta_description": "Dengan penuh syukur kami mengundang Anda untuk hadir di hari pernikahan kami."
+  },
+  "published_at": "2026-11-24T08:25:37.526+00:00"
+}

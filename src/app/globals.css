@@ -1,0 +1,151 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-admin: "DM Sans";
+    --c-primary: 69 75 64;
+    --c-secondary: 231 216 197;
+    --c-accent: 180 154 115;
+    --c-background: 250 248 243;
+    --c-surface: 255 255 255;
+    --c-text: 41 41 41;
+    --c-on-primary: 250 248 243;
+    --c-accent-ink: 122 100 66;
+    --radius: 2px;
+    --overlay: 0.42;
+    --nav-h: 0px;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply antialiased;
+  }
+
+  /* R-39: kursor untuk semua kontrol aktif dan nonaktif */
+  a[href],
+  button,
+  summary,
+  select,
+  label[for],
+  [role="button"],
+  [role="tab"],
+  [role="switch"],
+  input[type="checkbox"],
+  input[type="radio"],
+  input[type="color"],
+  input[type="range"] {
+    cursor: pointer;
+  }
+  button:disabled,
+  input:disabled,
+  select:disabled,
+  textarea:disabled,
+  [aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+
+  :focus-visible {
+    outline: 2px solid rgb(var(--c-accent-ink));
+    outline-offset: 3px;
+  }
+
+  .admin :focus-visible {
+    outline-color: #454b40;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html.smooth {
+      scroll-behavior: smooth;
+    }
+  }
+}
+
+@layer components {
+  /* Motif identitas: penanda folio ala majalah (nomor + garis rambut emas). */
+  .folio {
+    @apply inline-flex items-center gap-3 font-body text-[0.72rem] font-medium tracking-[0.18em];
+  }
+  .folio::after {
+    content: "";
+    @apply block h-px w-10;
+    background: rgb(var(--c-accent));
+  }
+
+  .hairline {
+    background: rgb(var(--c-accent) / 0.55);
+    height: 1px;
+  }
+
+  .inv-btn {
+    @apply relative inline-flex min-h-[46px] items-center justify-center gap-2 px-6 font-body text-sm font-medium tracking-wide transition-[background-color,color,box-shadow,transform,border-color] duration-300 ease-silk active:scale-[0.98] disabled:opacity-55;
+    border-radius: var(--radius);
+  }
+  .inv-btn[data-variant="solid"] {
+    background: rgb(var(--btn-bg));
+    color: rgb(var(--btn-fg));
+    border: 1px solid rgb(var(--btn-bg));
+  }
+  .inv-btn[data-variant="solid"]:hover:not(:disabled) {
+    box-shadow: 0 0 0 4px rgb(var(--btn-bg) / 0.15);
+  }
+  .inv-btn[data-variant="outline"] {
+    background: transparent;
+    color: rgb(var(--btn-ink));
+    border: 1px solid rgb(var(--btn-ink) / 0.6);
+  }
+  .inv-btn[data-variant="outline"]:hover:not(:disabled) {
+    background: rgb(var(--btn-ink) / 0.07);
+    border-color: rgb(var(--btn-ink));
+  }
+  .inv-btn[data-variant="underline"] {
+    @apply px-1;
+    background: transparent;
+    color: rgb(var(--btn-ink));
+    border-bottom: 1px solid rgb(var(--btn-ink));
+    border-radius: 0;
+  }
+  .inv-btn[data-variant="underline"]:hover:not(:disabled) {
+    border-bottom-width: 2px;
+  }
+  .inv-btn[data-variant="ghost"] {
+    @apply min-h-[44px] px-3;
+    color: rgb(var(--btn-ink));
+  }
+  .inv-btn[data-variant="ghost"]:hover:not(:disabled) {
+    background: rgb(var(--btn-ink) / 0.08);
+  }
+
+  .inv-field {
+    @apply w-full border bg-transparent px-4 py-3 font-body text-base transition-colors duration-200 placeholder:opacity-60 focus:outline-none;
+    border-color: rgb(var(--tone-ink) / 0.28);
+    border-radius: var(--radius);
+    color: rgb(var(--tone-ink));
+  }
+  .inv-field:focus {
+    border-color: rgb(var(--tone-ink));
+    box-shadow: 0 0 0 3px rgb(var(--c-accent) / 0.25);
+  }
+  .inv-field[aria-invalid="true"] {
+    border-color: #b3261e;
+  }
+
+  .pb-safe {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

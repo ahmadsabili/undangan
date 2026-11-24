@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1200" viewBox="0 0 900 1200">
+<defs>
+<radialGradient id="g" cx="38%" cy="32%" r="85%"><stop offset="0" stop-color="#E3D6C4"/><stop offset="0.55" stop-color="#C9B79C"/><stop offset="1" stop-color="#9E9079"/></radialGradient>
+<filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.09 0"/></filter>
+</defs>
+<rect width="100%" height="100%" fill="url(#g)"/>
+<rect width="100%" height="100%" filter="url(#n)"/>
+<ellipse cx="450" cy="1260" rx="288" ry="504" fill="#000" fill-opacity="0.07"/>
+<ellipse cx="450" cy="600" rx="99" ry="117" fill="#000" fill-opacity="0.05"/>
+<text x="450" y="144" text-anchor="middle" font-family="Georgia, serif" font-size="25" fill="#fff" fill-opacity="0.78" letter-spacing="3.75">[Foto mempelai pertama]</text>
+</svg>
