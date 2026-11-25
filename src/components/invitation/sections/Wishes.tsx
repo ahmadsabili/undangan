@@ -8,12 +8,15 @@ import { useInvitation } from "../context";
 import { InvButton } from "../InvButton";
 import { Reveal } from "../Reveal";
 import { SectionFrame } from "../SectionFrame";
+import { ReadablePanel, useLayout } from "../layout";
+import { cn } from "@/lib/utils";
 
 type Content = { page_size?: number; pending_message?: string };
 type Wish = { id: string; name: string; message: string; created_at: string };
 
 export function Wishes({ section, folio }: { section: Section<Content>; folio: number }) {
   const { data, guest, t, mode } = useInvitation();
+  const { layout } = useLayout();
   const lang = data.settings.language;
   const pageSize = Math.min(Math.max(Number(section.content.page_size) || 6, 3), 30);
   const [items, setItems] = useState<Wish[]>([]);
@@ -101,8 +104,9 @@ export function Wishes({ section, folio }: { section: Section<Content>; folio: n
 
   return (
     <SectionFrame section={section} folio={folio} align="left">
-      <div className="mx-auto grid max-w-5xl gap-14 md:grid-cols-12">
-        <form onSubmit={submit} noValidate className="space-y-5 md:col-span-5">
+      <ReadablePanel className="mx-auto max-w-5xl">
+      <div className={cn("mx-auto grid gap-14", layout === "editorial" ? "max-w-5xl md:grid-cols-12" : "max-w-2xl")}>
+        <form onSubmit={submit} noValidate className={cn("space-y-5 text-left", layout === "editorial" && "md:col-span-5")}>
           <div>
             <label htmlFor="wish-name" className="mb-2 block font-body text-sm font-medium">
               {t.wishName}
@@ -134,7 +138,7 @@ export function Wishes({ section, folio }: { section: Section<Content>; folio: n
           </InvButton>
         </form>
 
-        <div className="md:col-span-7" aria-live="polite">
+        <div className={cn("text-left", layout === "editorial" && "md:col-span-7")} aria-live="polite">
           {state === "loading" && (
             <ul className="space-y-6" aria-label="Memuat ucapan">
               {[0, 1, 2].map((i) => (
@@ -185,6 +189,7 @@ export function Wishes({ section, folio }: { section: Section<Content>; folio: n
           )}
         </div>
       </div>
+      </ReadablePanel>
     </SectionFrame>
   );
 }

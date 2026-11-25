@@ -4,6 +4,7 @@ import { AnimatePresence, MotionConfig } from "framer-motion";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getMedia } from "@/lib/media";
 import { motionScale, themeStyle } from "@/lib/theme";
+import { cn } from "@/lib/utils";
 import type { GuestContext, InvitationData, Section } from "@/types/invitation";
 import { BottomNav } from "./BottomNav";
 import { InvitationContext } from "./context";
@@ -88,10 +89,26 @@ export function Invitation({
   }, [visible]);
   const saveTheDateHref = visible.some((x) => x.key === "countdown") ? "#countdown" : visible.some((x) => x.key === "events") ? "#events" : "#hero";
 
+  // Template Sinematik: foto latar tiap section. Pakai foto pilihan admin; bila kosong,
+  // bergiliran memakai foto galeri lalu foto hero/cover agar tiap section tetap berfoto.
+  const photos = useMemo(() => {
+    if (theme.layout !== "cinematic") return {};
+    const pool = [
+      ...data.gallery.map((g) => getMedia(data, g.media_id)),
+      getMedia(data, (data.sections.find((x) => x.key === "hero")?.content as { media_id?: string })?.media_id),
+      getMedia(data, (data.sections.find((x) => x.key === "cover")?.content as { media_id?: string })?.media_id),
+    ].filter((m): m is NonNullable<typeof m> => Boolean(m && m.kind === "image"));
+    let i = 0;
+    return Object.fromEntries(
+      visible.map((x) => [x.id, getMedia(data, x.background_media_id) ?? (pool.length ? pool[i++ % pool.length] : null)]),
+    );
+  }, [data, visible, theme.layout]);
+
   const ctx = useMemo(
-    () => ({ data, guest, mode, t: DICT[s.language] ?? DICT.id, motion: motionScale(theme.animation) }),
-    [data, guest, mode, s.language, theme.animation],
+    () => ({ data, guest, mode, t: DICT[s.language] ?? DICT.id, motion: motionScale(theme.animation), photos }),
+    [data, guest, mode, s.language, theme.animation, photos],
   );
+  const card = theme.layout === "card";
 
   useEffect(() => {
     document.documentElement.lang = s.language;
@@ -124,10 +141,19 @@ export function Invitation({
   return (
     <InvitationContext.Provider value={ctx}>
       <MotionConfig reducedMotion="user">
-        <div className="min-h-[100dvh] bg-bg font-body text-ink" style={themeStyle(theme)}>
+        <div data-layout={theme.layout} className={card ? "min-h-[100dvh] bg-secondary font-body text-ink md:py-10" : "min-h-[100dvh] bg-bg font-body text-ink"} style={themeStyle(theme)}>
           <AnimatePresence>{!showContent && cover && <Cover key="cover" section={cover} onOpen={open} />}</AnimatePresence>
 
-          <main id="main" aria-hidden={!showContent} inert={!showContent || undefined} className="pb-24">
+          <main
+            id="main"
+            aria-hidden={!showContent}
+            inert={!showContent || undefined}
+            className={cn(
+              card && "mx-auto w-full max-w-[460px] overflow-hidden bg-bg md:rounded-[calc(var(--radius)+14px)] md:shadow-[0_24px_60px_rgb(0_0_0/0.12)]",
+              // Ruang untuk navigasi bawah, kecuali bila section penutup (yang sudah berpadding) ada di akhir.
+              visible[visible.length - 1]?.key !== "closing" && "pb-24",
+            )}
+          >
             {visible.map((section) => renderSection(section, folios[section.id], saveTheDateHref))}
           </main>
 

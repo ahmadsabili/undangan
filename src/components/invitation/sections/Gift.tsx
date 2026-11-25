@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, Gift as GiftIcon, QrCode, X } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useId, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { getMedia } from "@/lib/media";
 import type { Section, WeddingGift } from "@/types/invitation";
 import { useInvitation } from "../context";
@@ -97,6 +98,8 @@ export function Gift({ section, folio }: { section: Section; folio: number }) {
   const [open, setOpen] = useState(false);
   const [qris, setQris] = useState<WeddingGift | null>(null);
   const panelId = useId();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const gifts = data.gifts.filter((g) => g.enabled);
   if (!gifts.length) return null;
 
@@ -130,7 +133,8 @@ export function Gift({ section, folio }: { section: Section; folio: number }) {
           )}
         </AnimatePresence>
       </div>
-      <AnimatePresence>{qris && <QrisDialog gift={qris} onClose={() => setQris(null)} />}</AnimatePresence>
+      {mounted &&
+        createPortal(<AnimatePresence>{qris && <QrisDialog gift={qris} onClose={() => setQris(null)} />}</AnimatePresence>, document.body)}
     </SectionFrame>
   );
 }

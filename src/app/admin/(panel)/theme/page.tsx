@@ -5,6 +5,9 @@ import { useCallback, useEffect, useState } from "react";
 import { Badge, Button, Card, ErrorState, Field, Input, LoadingBlock, PageHeader, Select, useToast } from "@/components/ui";
 import { FONT_OPTIONS, googleFontsHref } from "@/config/fonts";
 import { BACKGROUND_OPTIONS, SECTION_META } from "@/config/sections";
+import { LAYOUTS } from "@/config/layouts";
+import { LayoutSketch } from "@/components/admin/LayoutSketch";
+import { MediaField } from "@/components/admin/MediaPicker";
 import { contrastWarnings, normalizeTheme, toneFor } from "@/lib/theme";
 import { cn, slugify } from "@/lib/utils";
 import { db, emitDraftChanged } from "@/services/admin";
@@ -128,6 +131,44 @@ export default function ThemePage() {
       />
 
       <div className="grid gap-6">
+        <Card title="Template tata letak" description="Mengubah susunan dan komposisi seluruh undangan. Warna, font, dan konten tidak berubah.">
+          <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {LAYOUTS.map((l) => {
+              const active = theme.layout === l.key;
+              return (
+                <li key={l.key}>
+                  <button
+                    type="button"
+                    aria-pressed={active}
+                    onClick={() => setTheme({ ...theme, layout: l.key })}
+                    className={cn("w-full rounded-lg border p-3 text-left transition-colors", active ? "border-admin-brand ring-2 ring-admin-brand/20" : "border-admin-line hover:border-admin-muted")}
+                  >
+                    <LayoutSketch layout={l.key} colors={theme.colors} />
+                    <span className="mt-3 flex items-center justify-between text-sm font-medium">
+                      {l.name}
+                      {active && <Check className="h-4 w-4" aria-hidden="true" />}
+                    </span>
+                    <span className="mt-0.5 block text-xs leading-relaxed text-admin-muted">{l.description}</span>
+                    <span className="mt-1 block text-xs text-admin-muted">Serasi dengan: {l.bestWith}</span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+          {theme.layout === "nusantara" && (
+            <div className="mt-5 rounded-md bg-[#F3F2EE] p-4">
+              <Field label="Gambar ornamen custom (opsional)" help="Kosongkan untuk motif kawung bawaan yang mengikuti warna aksen. Pakai PNG transparan atau SVG motif yang Anda punya hak pakainya, misalnya motif songket atau batik keluarga. Gambar diulang sebagai pita dan ditampilkan di pemisah judul.">
+                <MediaField label="ornamen" value={theme.ornamentMediaId} onChange={(v) => setTheme({ ...theme, ornamentMediaId: v })} />
+              </Field>
+            </div>
+          )}
+          {theme.layout === "cinematic" && (
+            <p className="mt-5 rounded-md bg-[#F3F2EE] p-4 text-sm text-admin-muted">
+              Tiap section memakai foto latar. Atur fotonya di menu Konten (kolom &quot;Foto latar&quot;). Bila kosong, foto galeri dipakai bergiliran.
+            </p>
+          )}
+        </Card>
+
         <Card title="Preset tema">
           <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {presets.map((p) => {
@@ -137,7 +178,8 @@ export default function ThemePage() {
                   <button
                     type="button"
                     onClick={() => {
-                      setTheme(normalizeTheme(p.tokens));
+                      // Preset hanya mengganti warna & gaya; template tata letak dan ornamen tetap.
+                      setTheme({ ...normalizeTheme(p.tokens), layout: theme.layout, ornamentMediaId: theme.ornamentMediaId });
                       setSlug(p.slug);
                     }}
                     aria-pressed={active}

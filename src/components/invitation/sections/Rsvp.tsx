@@ -13,6 +13,7 @@ import { useInvitation } from "../context";
 import { InvButton } from "../InvButton";
 import { Reveal } from "../Reveal";
 import { SectionFrame } from "../SectionFrame";
+import { ReadablePanel } from "../layout";
 
 type Content = { success_message?: string; closed_message?: string };
 type In = z.input<typeof rsvpSchema>;
@@ -84,7 +85,8 @@ export function Rsvp({ section, folio }: { section: Section<Content>; folio: num
 
   return (
     <SectionFrame section={section} folio={folio}>
-      <div className="mx-auto max-w-xl">
+      <ReadablePanel className="mx-auto max-w-xl">
+      <div className="mx-auto max-w-xl text-left">
         {s.rsvp_deadline && !closed && (
           <Reveal>
             <p className="mb-10 text-center font-body text-sm" style={{ color: "rgb(var(--tone-muted))" }}>
@@ -209,6 +211,7 @@ export function Rsvp({ section, folio }: { section: Section<Content>; folio: num
           </form>
         )}
       </div>
+      </ReadablePanel>
     </SectionFrame>
   );
 }

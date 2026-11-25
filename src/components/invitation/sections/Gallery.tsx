@@ -10,6 +10,7 @@ import { Lightbox } from "../Lightbox";
 import { Reveal } from "../Reveal";
 import { SectionFrame } from "../SectionFrame";
 import { SmartImage } from "../SmartImage";
+import { useLayout } from "../layout";
 
 type Content = { video_type?: "none" | "youtube" | "upload"; youtube_url?: string; video_media_id?: string; video_poster_id?: string };
 
@@ -59,6 +60,7 @@ function Video({ c }: { c: Content }) {
 
 export function Gallery({ section, folio }: { section: Section<Content>; folio: number }) {
   const { data, t } = useInvitation();
+  const { layout } = useLayout();
   const [open, setOpen] = useState<number | null>(null);
   const items = data.gallery
     .map((g) => ({ ...g, media: getMedia(data, g.media_id) }))
@@ -69,7 +71,7 @@ export function Gallery({ section, folio }: { section: Section<Content>; folio: 
       <div className="mx-auto max-w-6xl">
         {items.length === 0 ? (
           <p style={{ color: "rgb(var(--tone-muted))" }}>Foto akan segera ditambahkan.</p>
-        ) : (
+        ) : layout === "editorial" ? (
           <ul className="grid grid-flow-dense grid-cols-2 gap-2 [grid-auto-rows:9.5rem] sm:gap-3 md:grid-cols-4 md:[grid-auto-rows:13rem]">
             {items.map((g, i) => (
               <Reveal
@@ -87,6 +89,36 @@ export function Gallery({ section, folio }: { section: Section<Content>; folio: 
                   aria-label={`${t.photo} ${i + 1}${g.caption ? `: ${g.caption}` : ""}`}
                 >
                   <SmartImage media={g.media} sizes="(min-width: 768px) 25vw, 50vw" className="transition-transform duration-700 ease-silk group-hover:scale-[1.03]" />
+                </button>
+              </Reveal>
+            ))}
+          </ul>
+        ) : layout === "cinematic" ? (
+          // Filmstrip: digeser ke samping, berhenti tepat di tiap foto.
+          <ul className="-mx-6 flex snap-x snap-mandatory gap-3 overflow-x-auto px-6 pb-4 sm:-mx-10 sm:px-10" aria-label="Galeri foto, geser ke samping">
+            {items.map((g, i) => (
+              <li key={g.id} className="w-[78%] shrink-0 snap-center sm:w-[42%] md:w-[30%]">
+                <button type="button" onClick={() => setOpen(i)} className="group relative block aspect-[3/4] w-full overflow-hidden" style={{ borderRadius: "var(--radius)" }} aria-label={`${t.photo} ${i + 1}${g.caption ? `: ${g.caption}` : ""}`}>
+                  <SmartImage media={g.media} sizes="(min-width: 768px) 30vw, 78vw" className="transition-transform duration-700 ease-silk group-hover:scale-[1.03]" />
+                </button>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          // Klasik, Nusantara, Kartu: kisi seragam yang simetris.
+          <ul className={cn("grid gap-2 sm:gap-3", layout === "card" ? "grid-cols-2" : "grid-cols-2 md:grid-cols-3")}>
+            {items.map((g, i) => (
+              <Reveal as="li" key={g.id} variant="fade" delay={(i % 3) * 0.06}>
+                <button
+                  type="button"
+                  onClick={() => setOpen(i)}
+                  className={cn("group relative block aspect-square w-full overflow-hidden", layout !== "card" && "border p-1")}
+                  style={{ borderRadius: "var(--radius)", borderColor: "rgb(var(--c-accent) / 0.5)" }}
+                  aria-label={`${t.photo} ${i + 1}${g.caption ? `: ${g.caption}` : ""}`}
+                >
+                  <span className="relative block h-full w-full overflow-hidden" style={{ borderRadius: "var(--radius)" }}>
+                    <SmartImage media={g.media} sizes="(min-width: 768px) 33vw, 50vw" className="transition-transform duration-700 ease-silk group-hover:scale-[1.03]" />
+                  </span>
                 </button>
               </Reveal>
             ))}

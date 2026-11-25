@@ -8,18 +8,31 @@ import { useInvitation } from "../context";
 import { Monogram } from "../Monogram";
 import { Reveal } from "../Reveal";
 import { SmartImage } from "../SmartImage";
+import { MotifBand, MotifCorners, useLayout } from "../layout";
 
 // Sengaja menggemakan opening cover: foto penuh, overlay, monogram, nama.
 export function Closing({ section }: { section: Section<{ message?: string; signature?: string; media_id?: string }> }) {
   const { data } = useInvitation();
+  const { layout } = useLayout();
   const s = data.settings;
   const [p1, p2] = orderedCouple(s.couple);
   const photo = getMedia(data, section.content.media_id);
   return (
-    <section id="closing" aria-labelledby="closing-title" className="relative isolate flex min-h-[100svh] items-end overflow-hidden bg-primary px-6 pb-36 pt-24 text-center" style={{ color: "rgb(var(--c-on-primary))" }}>
+    <section id="closing" aria-labelledby="closing-title" className={`relative isolate flex ${layout === "card" ? "min-h-[640px]" : "min-h-[100svh]"} items-end overflow-hidden bg-primary px-6 pb-36 pt-24 text-center`} style={{ color: "rgb(var(--c-on-primary))" }}>
       {photo && <SmartImage media={photo} sizes="100vw" className="-z-10" />}
       <div aria-hidden="true" className="absolute inset-0 -z-10 bg-primary" style={{ opacity: "var(--overlay)" }} />
       <div aria-hidden="true" className="absolute inset-0 -z-10" style={{ background: "linear-gradient(180deg, rgb(var(--c-primary) / 0.1) 0%, rgb(var(--c-primary) / 0.9) 70%)" }} />
+      {layout === "classic" && (
+        <div aria-hidden="true" className="pointer-events-none absolute inset-3 border p-[5px] sm:inset-6" style={{ borderColor: "rgb(var(--c-on-primary) / 0.55)" }}>
+          <div className="h-full border" style={{ borderColor: "rgb(var(--c-on-primary) / 0.3)" }} />
+        </div>
+      )}
+      {layout === "nusantara" && (
+        <>
+          <MotifBand className="absolute inset-x-0 top-0" />
+          <MotifCorners inset={22} size={52} />
+        </>
+      )}
       <div className="mx-auto w-full max-w-xl">
         <Reveal className="flex justify-center">
           <Monogram size={84} />

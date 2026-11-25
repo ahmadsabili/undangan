@@ -248,6 +248,7 @@ begin
   if exists (select 1 from public.wedding_settings where og_media_id = p_id) then used := array_append(used, 'Gambar share'); end if;
   if exists (select 1 from public.wedding_settings where music_media_id = p_id) then used := array_append(used, 'Musik latar'); end if;
   if exists (select 1 from public.wedding_settings where position(idtxt in couple::text) > 0) then used := array_append(used, 'Profil mempelai'); end if;
+  if exists (select 1 from public.wedding_settings where position(idtxt in theme::text) > 0) then used := array_append(used, 'Ornamen tema'); end if;
   used := used || coalesce((select array_agg('Section: ' || coalesce(nullif(title, ''), key))
                             from public.wedding_sections
                             where background_media_id = p_id or position(idtxt in content::text) > 0), '{}');
