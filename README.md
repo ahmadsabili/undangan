@@ -46,6 +46,10 @@ Website undangan pernikahan satu halaman dengan dashboard admin. Seluruh konten,
 - Editor tema: 6 preset warna (Modern Elegant, Classic Luxury, Botanical Garden, Minimalist Monochrome, Romantic Champagne, Editorial Wedding), warna, font, ukuran huruf, radius, gaya tombol & navigasi, intensitas animasi, overlay foto, latar per section, cek kontras otomatis.
 - Media library: upload banyak file, kompresi WebP, alt text, titik fokus, ganti file tanpa merusak referensi, penghapusan aman.
 - Daftar tamu: CRUD, cari, filter, import/export CSV, tautan berkode unik, QR code, pesan WhatsApp siap kirim.
+- **Fitur opsional** (aktif/nonaktif di Pengaturan > Fitur tambahan, bawaan nonaktif):
+  - **Undangan per acara/sesi**: tiap tamu hanya melihat acara yang ditujukan untuknya; atur per tamu, per kategori, atau lewat kolom `acara` di CSV. Variabel WhatsApp `{acara_tamu}`.
+  - **Status "sudah dibuka"**: mencatat kapan tamu berkode membuka undangan (dicatat dari browser, bukan dari pratinjau tautan WhatsApp).
+  - **Check-in hari H**: halaman `/checkin` untuk penerima tamu, scan QR dengan kamera ponsel, cari nama, catat tamu walk-in, rekap kehadiran langsung. Akun petugas khusus dengan akses terbatas.
 - Template pesan WhatsApp yang bisa diedit.
 - Manajemen RSVP dan ucapan, export CSV.
 - Preview draft untuk mobile, tablet, desktop.
@@ -121,7 +125,8 @@ Bila Supabase belum diisi, halaman undangan menampilkan petunjuk konfigurasi, bu
    2. `supabase/migrations/20261124000002_functions.sql`
    3. `supabase/migrations/20261124000003_security.sql`
    4. `supabase/migrations/20261125000004_layout_templates.sql`
-   5. `supabase/seed.sql`
+   5. `supabase/migrations/20261126000005_guest_features.sql`
+   6. `supabase/seed.sql`
 3. Buka **Authentication > Sign In / Providers > Email** dan **matikan "Allow new users to sign up"**. Akun admin dibuat lewat skrip, bukan pendaftaran.
 4. Cek **Storage**: bucket `media` (public) sudah dibuat oleh migration ketiga.
 
@@ -152,6 +157,12 @@ Alternatif dengan Supabase CLI: `supabase link --project-ref <ref>` lalu `supaba
 
 ```bash
 npm run create-admin -- email@anda.com "password-minimal-10-karakter"
+```
+
+Untuk akun **petugas check-in** (hanya bisa membuka `/checkin`, tidak bisa melihat dashboard atau nomor WhatsApp tamu), tambahkan argumen `checkin`:
+
+```bash
+npm run create-admin -- petugas@email.com "password-minimal-10-karakter" checkin
 ```
 
 Skrip membuat user di Supabase Auth (email langsung terverifikasi) lalu memberi peran `admin`. Bila email sudah terdaftar, skrip hanya mempromosikan peran tanpa mengubah password. Jalankan dari komputer Anda dengan `.env.local` berisi service role key.
@@ -205,7 +216,7 @@ Saran: export konfigurasi sebelum perubahan besar dan seminggu sekali menjelang 
 
 ```bash
 npm run test:lib    # zona waktu, kalender, sanitasi, spam, kontras (16 pemeriksaan)
-npm run test:sql    # migration + seed + RLS + draft/publish + backup/restore di PGlite (21 pemeriksaan)
+npm run test:sql    # migration + seed + RLS + draft/publish + backup/restore + fitur tamu di PGlite (32 pemeriksaan)
 npm run typecheck
 npm run lint
 npm run build

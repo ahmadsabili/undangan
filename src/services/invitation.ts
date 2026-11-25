@@ -76,11 +76,11 @@ export async function getGuestContext(
   if (code && /^[A-Z0-9]{6,16}$/.test(code) && isSupabaseConfigured()) {
     const { data } = await getPublicSupabase().rpc("get_guest_by_code", { p_code: code });
     if (data && typeof data === "object") {
-      const g = data as { name: string; code: string; max_pax: number; rsvp: GuestContext["rsvp"] };
-      return { name: g.name, code: g.code, maxPax: g.max_pax, rsvp: g.rsvp ?? null };
+      const g = data as { name: string; code: string; max_pax: number; rsvp: GuestContext["rsvp"]; event_ids?: string[] | null };
+      return { name: g.name, code: g.code, maxPax: g.max_pax, rsvp: g.rsvp ?? null, eventIds: g.event_ids?.length ? g.event_ids : null };
     }
   }
   const raw = typeof params.to === "string" ? params.to : "";
   const name = raw.replace(/[<>{}\u0000-\u001F]/g, "").trim().slice(0, 80);
-  return { name: name || defaultName, code: null, maxPax: defaultMaxPax, rsvp: null };
+  return { name: name || defaultName, code: null, maxPax: defaultMaxPax, rsvp: null, eventIds: null };
 }

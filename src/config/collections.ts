@@ -9,6 +9,7 @@ export const EVENT_FIELDS: FieldDef[] = [
   { name: "venue_name", label: "Nama venue", type: "text" },
   { name: "address", label: "Alamat lengkap", type: "textarea", rows: 2 },
   { name: "maps_url", label: "Tautan Google Maps", type: "url", help: "Kosongkan untuk mencari otomatis dari alamat." },
+  { name: "capacity", label: "Kapasitas (opsional)", type: "number", help: "Jumlah orang maksimal. Dipakai di Ringkasan untuk memantau sesi bila fitur Undangan per acara aktif." },
   { name: "dress_code", label: "Dress code acara ini", type: "text" },
   { name: "notes", label: "Catatan", type: "textarea", rows: 2 },
 ];

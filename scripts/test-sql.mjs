@@ -202,6 +202,74 @@ await check("restore menolak dokumen tidak valid", async () => {
   await assert.rejects(as("authenticated", ADMIN, () => db.query(`select public.restore_config('{"version":9}'::jsonb)`)));
 });
 
+
+console.log("\nfitur tamu opsional");
+const CHECKER = "33333333-3333-4333-8333-333333333333";
+await db.exec(`insert into auth.users (id, email) values ('${CHECKER}', 'petugas@example.com');
+               update public.profiles set role = 'checkin' where id = '${CHECKER}';`);
+await check("semua fitur bawaan nonaktif", async () => {
+  const r = await db.query("select features from public.wedding_settings");
+  assert.deepEqual(r.rows[0].features, { sessions: false, open_tracking: false, checkin: false });
+});
+await check("fitur tidak ikut snapshot draft", async () => {
+  const r = await as("authenticated", ADMIN, () => db.query("select public.get_draft_invitation() as s"));
+  assert.equal(r.rows[0].s.settings.features, undefined);
+});
+let evId;
+await check("sesi nonaktif: tamu tidak menerima event_ids", async () => {
+  evId = (await db.query("select id from public.wedding_events order by sort_order limit 1")).rows[0].id;
+  await db.query("update public.guests set event_ids = array[$1::uuid] where name = 'Sari'", [evId]);
+  const r = await as("anon", null, () => db.query("select public.get_guest_by_code($1) as g", [code]));
+  assert.equal(r.rows[0].g.event_ids, null);
+});
+await check("sesi aktif: tamu menerima event_ids miliknya", async () => {
+  await as("authenticated", ADMIN, () => db.query(`update public.wedding_settings set features = features || '{"sessions": true}'`));
+  const r = await as("anon", null, () => db.query("select public.get_guest_by_code($1) as g", [code]));
+  assert.deepEqual(r.rows[0].g.event_ids, [evId]);
+});
+await check("status dibuka: nonaktif tidak mencatat, aktif mencatat", async () => {
+  const off = await as("service_role", null, () => db.query("select public.record_guest_open($1) as ok", [code]));
+  assert.equal(off.rows[0].ok, false);
+  await db.query(`update public.wedding_settings set features = features || '{"open_tracking": true}'`);
+  await as("service_role", null, () => db.query("select public.record_guest_open($1) as ok", [code]));
+  await as("service_role", null, () => db.query("select public.record_guest_open($1) as ok", [code]));
+  const g = await db.query("select opened_at is not null as opened, open_count from public.guests where code = $1", [code]);
+  assert.deepEqual(g.rows[0], { opened: true, open_count: 2 });
+});
+await check("anon tidak bisa mencatat dibuka langsung", async () => {
+  await assert.rejects(as("anon", null, () => db.query("select public.record_guest_open($1)", [code])));
+});
+await check("check-in ditolak saat fitur nonaktif", async () => {
+  await assert.rejects(as("authenticated", CHECKER, () => db.query("select public.checkin_lookup('Sari')")), /belum diaktifkan/);
+});
+await check("petugas check-in: cari via QR, check-in, undo", async () => {
+  await db.query(`update public.wedding_settings set features = features || '{"checkin": true}'`);
+  const found = await as("authenticated", CHECKER, () => db.query("select public.checkin_lookup($1) as r", [`https://contoh.com/?guest=${code}`]));
+  const g = found.rows[0].r[0];
+  assert.equal(g.name, "Sari");
+  assert.equal(g.whatsapp, undefined);
+  const m = await as("authenticated", CHECKER, () => db.query("select public.checkin_mark($1, 2) as r", [g.id]));
+  assert.equal(m.rows[0].r.checked_in_pax, 2);
+  const s = await as("authenticated", CHECKER, () => db.query("select public.checkin_summary() as s"));
+  assert.equal(s.rows[0].s.pax_checked_in, 2);
+  const u = await as("authenticated", CHECKER, () => db.query("select public.checkin_undo($1) as r", [g.id]));
+  assert.equal(u.rows[0].r.checked_in_at, null);
+});
+await check("petugas check-in: cari nama & walk-in", async () => {
+  const r = await as("authenticated", CHECKER, () => db.query("select public.checkin_lookup('bud') as r"));
+  assert.equal(r.rows[0].r[0].name, "Budi Santoso");
+  const w = await as("authenticated", CHECKER, () => db.query("select public.checkin_walkin('Pak Joko', 3) as r"));
+  assert.equal(w.rows[0].r.category, "Walk-in");
+});
+await check("petugas check-in tidak bisa membaca tabel tamu / pengaturan", async () => {
+  const g = await as("authenticated", CHECKER, () => db.query("select * from public.guests"));
+  assert.equal(g.rows.length, 0);
+  await assert.rejects(as("authenticated", CHECKER, () => db.query("select public.get_draft_invitation()")));
+});
+await check("pengguna biasa tidak bisa check-in", async () => {
+  await assert.rejects(as("authenticated", VIEWER, () => db.query("select public.checkin_lookup('Sari')")), /Akses ditolak/);
+});
+
 console.log("\nservice role");
 await check("rate limit menolak setelah batas", async () => {
   const results = [];

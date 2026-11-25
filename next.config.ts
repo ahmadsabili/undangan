@@ -25,8 +25,16 @@ const nextConfig: NextConfig = {
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           { key: "X-Frame-Options", value: "SAMEORIGIN" },
-          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
         ],
+      },
+      // Kamera hanya diizinkan di halaman check-in (pemindai QR); halaman lain tetap terkunci.
+      {
+        source: "/((?!checkin).*)",
+        headers: [{ key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" }],
+      },
+      {
+        source: "/checkin",
+        headers: [{ key: "Permissions-Policy", value: "camera=(self), microphone=(), geolocation=()" }],
       },
       {
         source: "/admin/:path*",

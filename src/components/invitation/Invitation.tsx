@@ -75,6 +75,12 @@ export function Invitation({
   mode?: "public" | "preview";
   startOpen?: boolean;
 }) {
+  // Fitur sesi: tamu hanya melihat acara yang ditujukan untuknya.
+  const scoped = useMemo(() => {
+    if (!guest.eventIds?.length) return data;
+    const events = data.events.filter((e) => guest.eventIds!.includes(e.id));
+    return events.length ? { ...data, events } : data;
+  }, [data, guest.eventIds]);
   const s = data.settings;
   const theme = s.theme;
   const [opened, setOpened] = useState(startOpen);
@@ -105,14 +111,31 @@ export function Invitation({
   }, [data, visible, theme.layout]);
 
   const ctx = useMemo(
-    () => ({ data, guest, mode, t: DICT[s.language] ?? DICT.id, motion: motionScale(theme.animation), photos }),
-    [data, guest, mode, s.language, theme.animation, photos],
+    () => ({ data: scoped, guest, mode, t: DICT[s.language] ?? DICT.id, motion: motionScale(theme.animation), photos }),
+    [scoped, guest, mode, s.language, theme.animation, photos],
   );
   const card = theme.layout === "card";
 
   useEffect(() => {
     document.documentElement.lang = s.language;
   }, [s.language]);
+
+  // Fitur "sudah dibuka": dicatat dari browser (bukan saat render server) supaya
+  // pratinjau tautan WhatsApp tidak dihitung sebagai tamu membuka undangan.
+  useEffect(() => {
+    if (mode !== "public" || !guest.code) return;
+    const key = `opened:${guest.code}`;
+    try {
+      if (sessionStorage.getItem(key)) return;
+      sessionStorage.setItem(key, "1");
+    } catch {
+      /* storage tidak tersedia */
+    }
+    const t = setTimeout(() => {
+      fetch("/api/open", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code: guest.code }), keepalive: true }).catch(() => undefined);
+    }, 1500);
+    return () => clearTimeout(t);
+  }, [mode, guest.code]);
 
   // Kunci scroll sampai undangan dibuka.
   useEffect(() => {

@@ -62,6 +62,7 @@ export function WhatsappDialog({
   names,
   templates,
   onMarkSent,
+  extraVars = {},
 }: {
   open: boolean;
   onClose: () => void;
@@ -71,6 +72,7 @@ export function WhatsappDialog({
   names: [string, string];
   templates: Template[];
   onMarkSent?: () => Promise<void>;
+  extraVars?: Record<string, string>;
 }) {
   const toast = useToast();
   const [tplId, setTplId] = useState<string>("");
@@ -80,8 +82,9 @@ export function WhatsappDialog({
     if (!open) return;
     const tpl = templates.find((t) => t.id === tplId) ?? templates[0];
     if (tpl && !tplId) setTplId(tpl.id);
-    setText(tpl ? fillTemplate(tpl.body, { nama_tamu: guestName, nama_mempelai_1: names[0], nama_mempelai_2: names[1], link_undangan: link }) : link);
-  }, [open, tplId, templates, guestName, names, link]);
+    setText(tpl ? fillTemplate(tpl.body, { nama_tamu: guestName, nama_mempelai_1: names[0], nama_mempelai_2: names[1], link_undangan: link, ...extraVars }) : link);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, tplId, templates, guestName, names, link, JSON.stringify(extraVars)]);
 
   const number = phone ? normalizeWhatsapp(phone) : "";
   const waUrl = `https://wa.me/${number}?text=${encodeURIComponent(text)}`;

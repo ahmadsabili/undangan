@@ -20,7 +20,7 @@ export async function middleware(request: NextRequest) {
   });
 
   const { data } = await supabase.auth.getUser();
-  const isAdminArea = request.nextUrl.pathname.startsWith("/admin");
+  const isAdminArea = request.nextUrl.pathname.startsWith("/admin") || request.nextUrl.pathname.startsWith("/checkin");
 
   if (isAdminArea && !isLogin && !data.user) {
     const login = request.nextUrl.clone();
@@ -38,5 +38,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/preview"],
+  matcher: ["/admin/:path*", "/preview", "/checkin"],
 };

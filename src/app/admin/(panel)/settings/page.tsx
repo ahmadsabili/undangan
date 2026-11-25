@@ -5,6 +5,8 @@ import { MediaField } from "@/components/admin/MediaPicker";
 import { Badge, Button, Card, ErrorState, Field, Input, LoadingBlock, PageHeader, Select, Switch, Textarea, useConfirm, useToast } from "@/components/ui";
 import { TIMEZONES, utcToZonedInput, zonedInputToIso } from "@/lib/date";
 import { db, emitDraftChanged, errMessage, setPublished } from "@/services/admin";
+import { useFeatures } from "@/components/admin/useFeatures";
+import type { FeatureFlags } from "@/types/invitation";
 
 type Row = {
   site_name: string;
@@ -125,6 +127,8 @@ export default function SettingsPage() {
           <Switch label={row.is_published ? "Undangan online" : "Undangan offline"} description="Saat offline, tautan undangan menampilkan pesan bahwa undangan belum tersedia." checked={row.is_published} disabled={pubBusy} onChange={togglePublished} />
         </Card>
 
+        <FeatureToggles />
+
         <Card title="Umum">
           <div className="grid gap-5 md:grid-cols-2">
             <Field label="Nama website" htmlFor="site_name">
@@ -211,5 +215,60 @@ export default function SettingsPage() {
         <div className="flex justify-end gap-2">{saveBar}</div>
       </div>
     </>
+  );
+}
+
+const FEATURE_INFO: { key: keyof FeatureFlags; label: string; description: string }[] = [
+  {
+    key: "sessions",
+    label: "Undangan per acara / sesi",
+    description: "Tentukan acara mana yang dilihat tiap tamu (misalnya akad hanya keluarga, resepsi sesi 1 atau 2). Diatur di Daftar Tamu. Tamu tanpa pengaturan tetap melihat semua acara.",
+  },
+  {
+    key: "open_tracking",
+    label: "Status \"sudah dibuka\"",
+    description: "Mencatat kapan tamu berkode pertama kali membuka undangannya, agar Anda bisa mengingatkan yang belum membuka. Tidak mencatat data lain.",
+  },
+  {
+    key: "checkin",
+    label: "Check-in hari H dengan QR",
+    description: "Petugas penerima tamu memindai QR tamu di halaman /checkin untuk mencatat kehadiran. Akun petugas dibuat dengan npm run create-admin -- email password checkin.",
+  },
+];
+
+function FeatureToggles() {
+  const { features, error, setFeature } = useFeatures();
+  const toast = useToast();
+  const [busy, setBusy] = useState<string | null>(null);
+  return (
+    <Card title="Fitur tambahan" description="Aktifkan sesuai kebutuhan. Berlaku langsung, tidak perlu Publish.">
+      {error && <p className="mb-4 rounded-md bg-[#FBF1EF] px-4 py-3 text-sm text-[#7E2A1D]">{error}</p>}
+      {!features ? (
+        <LoadingBlock rows={3} />
+      ) : (
+        <div className="space-y-5">
+          {FEATURE_INFO.map((f) => (
+            <Switch
+              key={f.key}
+              label={f.label}
+              description={f.description}
+              checked={features[f.key]}
+              disabled={busy === f.key || Boolean(error)}
+              onChange={async (v) => {
+                setBusy(f.key);
+                try {
+                  await setFeature(f.key, v);
+                  toast("ok", `${f.label} ${v ? "diaktifkan" : "dinonaktifkan"}.`);
+                } catch (e) {
+                  toast("error", errMessage(e));
+                } finally {
+                  setBusy(null);
+                }
+              }}
+            />
+          ))}
+        </div>
+      )}
+    </Card>
   );
 }

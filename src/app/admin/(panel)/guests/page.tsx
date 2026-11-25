@@ -1,13 +1,17 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Download, FileUp, Link2, MessageCircle, Pencil, Plus, QrCode, Search, Trash2 } from "lucide-react";
+import { CalendarRange, Download, FileUp, Link2, MessageCircle, Pencil, Plus, QrCode, Search, Trash2 } from "lucide-react";
 import Papa from "papaparse";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import type { z } from "zod";
 import { CopyInline, QrDialog, WhatsappDialog } from "@/components/admin/ShareDialogs";
 import { siteOrigin, useInviteContext } from "@/components/admin/useInviteContext";
+import { useFeatures } from "@/components/admin/useFeatures";
+import { useEventsList, type EventLite } from "@/components/admin/useEventsList";
+import { relativeTime } from "@/lib/date";
+import { DEFAULT_FEATURES } from "@/types/invitation";
 import { Badge, Button, Card, Dialog, EmptyState, ErrorState, Field, Input, LoadingBlock, PageHeader, Select, Textarea, useConfirm, useToast } from "@/components/ui";
 import { copyText, downloadText, guestLink, nameLink } from "@/lib/utils";
 import { db, errMessage, toCsv } from "@/services/admin";
@@ -25,6 +29,11 @@ type Guest = {
   notes: string;
   created_at: string;
   rsvps: { attendance: "hadir" | "tidak_hadir" | "ragu"; pax: number } | null;
+  event_ids?: string[] | null;
+  opened_at?: string | null;
+  open_count?: number;
+  checked_in_at?: string | null;
+  checked_in_pax?: number | null;
 };
 
 const RSVP_LABEL = { hadir: "Hadir", tidak_hadir: "Tidak hadir", ragu: "Ragu" } as const;
@@ -43,6 +52,10 @@ export default function GuestsPage() {
   const [importOpen, setImportOpen] = useState(false);
   const [quickName, setQuickName] = useState("");
   const { names, templates } = useInviteContext();
+  const { features } = useFeatures();
+  const f = features ?? DEFAULT_FEATURES;
+  const ev = useEventsList();
+  const [bulkOpen, setBulkOpen] = useState(false);
   const toast = useToast();
   const confirm = useConfirm();
   const origin = siteOrigin();
@@ -68,7 +81,11 @@ export default function GuestsPage() {
           (status === "terkirim" && g.invitation_status === "terkirim") ||
           (status === "belum_dikirim" && g.invitation_status === "belum_dikirim") ||
           (status === "belum_rsvp" && !g.rsvps) ||
-          (status === "sudah_rsvp" && g.rsvps)),
+          (status === "sudah_rsvp" && g.rsvps) ||
+          (status === "belum_dibuka" && g.invitation_status === "terkirim" && !g.opened_at) ||
+          (status === "sudah_dibuka" && g.opened_at) ||
+          (status === "sudah_checkin" && g.checked_in_at) ||
+          (status === "belum_checkin" && !g.checked_in_at)),
     );
   }, [guests, q, cat, status]);
   useEffect(() => setPage(0), [q, cat, status]);
@@ -94,6 +111,9 @@ export default function GuestsPage() {
       link: guestLink(origin, g.code),
       rsvp: g.rsvps ? RSVP_LABEL[g.rsvps.attendance] : "Belum",
       rsvp_pax: g.rsvps?.pax ?? "",
+      acara: g.event_ids?.length ? ev.titles(g.event_ids).join("; ") : "Semua",
+      dibuka: g.opened_at ? new Date(g.opened_at).toLocaleString("id-ID") : "",
+      checkin: g.checked_in_at ? `${g.checked_in_pax} orang, ${new Date(g.checked_in_at).toLocaleString("id-ID")}` : "",
     }));
     downloadText(
       `daftar-tamu-${new Date().toISOString().slice(0, 10)}.csv`,
@@ -108,6 +128,9 @@ export default function GuestsPage() {
         { key: "rsvp", label: "rsvp" },
         { key: "rsvp_pax", label: "jumlah_hadir" },
         { key: "notes", label: "catatan" },
+        ...(f.sessions ? [{ key: "acara", label: "acara" }] : []),
+        ...(f.open_tracking ? [{ key: "dibuka", label: "dibuka" }] : []),
+        ...(f.checkin ? [{ key: "checkin", label: "checkin" }] : []),
       ]),
       "text/csv",
     );
@@ -120,6 +143,12 @@ export default function GuestsPage() {
         description="Setiap tamu mendapat tautan berkode unik. Nomor WhatsApp tidak pernah dimasukkan ke tautan."
         actions={
           <>
+            {f.sessions && (
+              <Button onClick={() => setBulkOpen(true)}>
+                <CalendarRange className="h-4 w-4" aria-hidden="true" />
+                Atur acara per kategori
+              </Button>
+            )}
             <Button onClick={() => setImportOpen(true)}>
               <FileUp className="h-4 w-4" aria-hidden="true" />
               Import CSV
@@ -172,6 +201,10 @@ export default function GuestsPage() {
             <option value="terkirim">Undangan terkirim</option>
             <option value="belum_rsvp">Belum RSVP</option>
             <option value="sudah_rsvp">Sudah RSVP</option>
+            {f.open_tracking && <option value="belum_dibuka">Terkirim, belum dibuka</option>}
+            {f.open_tracking && <option value="sudah_dibuka">Sudah dibuka</option>}
+            {f.checkin && <option value="sudah_checkin">Sudah check-in</option>}
+            {f.checkin && <option value="belum_checkin">Belum check-in</option>}
           </Select>
         </div>
 
@@ -186,7 +219,7 @@ export default function GuestsPage() {
               {filtered.length} tamu{filtered.length !== guests!.length ? ` dari ${guests!.length}` : ""}
             </p>
             <div className="-mx-5 overflow-x-auto">
-              <table className="w-full min-w-[760px] text-sm">
+              <table className="w-full min-w-[960px] text-sm">
                 <thead>
                   <tr className="border-y border-admin-line bg-[#FAF9F6] text-left text-xs text-admin-muted">
                     <th scope="col" className="px-5 py-2 font-medium">Nama</th>
@@ -194,6 +227,9 @@ export default function GuestsPage() {
                     <th scope="col" className="px-3 py-2 font-medium">Maks</th>
                     <th scope="col" className="px-3 py-2 font-medium">Undangan</th>
                     <th scope="col" className="px-3 py-2 font-medium">RSVP</th>
+                    {f.sessions && <th scope="col" className="px-3 py-2 font-medium">Acara</th>}
+                    {f.open_tracking && <th scope="col" className="px-3 py-2 font-medium">Dibuka</th>}
+                    {f.checkin && <th scope="col" className="px-3 py-2 font-medium">Check-in</th>}
                     <th scope="col" className="px-5 py-2 text-right font-medium">Aksi</th>
                   </tr>
                 </thead>
@@ -210,6 +246,19 @@ export default function GuestsPage() {
                       <td className="px-3 py-2.5">
                         {g.rsvps ? <Badge tone={g.rsvps.attendance === "hadir" ? "ok" : g.rsvps.attendance === "ragu" ? "warn" : "danger"}>{RSVP_LABEL[g.rsvps.attendance]}{g.rsvps.attendance !== "tidak_hadir" ? ` · ${g.rsvps.pax}` : ""}</Badge> : <span className="text-xs text-admin-muted">Belum</span>}
                       </td>
+                      {f.sessions && (
+                        <td className="max-w-[180px] px-3 py-2.5 text-xs">
+                          {g.event_ids?.length ? ev.titles(g.event_ids).join(", ") : <span className="text-admin-muted">Semua acara</span>}
+                        </td>
+                      )}
+                      {f.open_tracking && (
+                        <td className="px-3 py-2.5 text-xs">
+                          {g.opened_at ? <span title={new Date(g.opened_at).toLocaleString("id-ID")}>{relativeTime(g.opened_at)}{g.open_count && g.open_count > 1 ? ` · ${g.open_count}x` : ""}</span> : <span className="text-admin-muted">Belum</span>}
+                        </td>
+                      )}
+                      {f.checkin && (
+                        <td className="px-3 py-2.5">{g.checked_in_at ? <Badge tone="ok">Hadir · {g.checked_in_pax}</Badge> : <span className="text-xs text-admin-muted">-</span>}</td>
+                      )}
                       <td className="px-5 py-2.5">
                         <div className="flex justify-end gap-1">
                           <CopyIcon text={guestLink(origin, g.code)} />
@@ -251,6 +300,7 @@ export default function GuestsPage() {
 
       {editing && (
         <GuestForm
+          events={f.sessions ? ev.events : []}
           guest={editing === "new" ? null : editing}
           categories={categories}
           onClose={() => setEditing(null)}
@@ -270,10 +320,12 @@ export default function GuestsPage() {
           link={wa.code ? guestLink(origin, wa.code) : nameLink(origin, wa.name)}
           names={names}
           templates={templates}
+          extraVars={{ acara_tamu: ev.describe(wa.event_ids) }}
           onMarkSent={wa.code ? () => markSent(wa) : undefined}
         />
       )}
-      <ImportDialog open={importOpen} onClose={() => setImportOpen(false)} onDone={load} />
+      <ImportDialog open={importOpen} onClose={() => setImportOpen(false)} onDone={load} events={f.sessions ? ev.events : []} />
+      {bulkOpen && <BulkEventsDialog categories={categories} events={ev.events} onClose={() => setBulkOpen(false)} onDone={load} />}
     </>
   );
 }
@@ -295,9 +347,10 @@ function CopyIcon({ text }: { text: string }) {
   );
 }
 
-function GuestForm({ guest, categories, onClose, onSaved }: { guest: Guest | null; categories: string[]; onClose: () => void; onSaved: (g: Guest) => void }) {
+function GuestForm({ guest, categories, onClose, onSaved, events }: { guest: Guest | null; categories: string[]; onClose: () => void; onSaved: (g: Guest) => void; events: EventLite[] }) {
   type In = z.input<typeof guestSchema>;
   type Out = z.output<typeof guestSchema>;
+  const [eventIds, setEventIds] = useState<string[]>(guest?.event_ids ?? []);
   const toast = useToast();
   const { register, handleSubmit, formState } = useForm<In, unknown, Out>({
     resolver: zodResolver(guestSchema),
@@ -307,7 +360,14 @@ function GuestForm({ guest, categories, onClose, onSaved }: { guest: Guest | nul
   });
 
   async function onSubmit(v: Out) {
-    const payload = { ...v, whatsapp: v.whatsapp || null, category: v.category || "Umum" };
+    // Semua dicentang atau tidak ada yang dicentang = tamu melihat semua acara.
+    const ids = eventIds.filter((id) => events.some((e) => e.id === id));
+    const payload = {
+      ...v,
+      whatsapp: v.whatsapp || null,
+      category: v.category || "Umum",
+      ...(events.length ? { event_ids: ids.length && ids.length < events.length ? ids : null } : {}),
+    };
     const q = guest ? db().from("guests").update(payload).eq("id", guest.id) : db().from("guests").insert(payload);
     const { data, error } = await q.select("*, rsvps(attendance, pax)").single();
     if (error) return toast("error", errMessage(error));
@@ -353,6 +413,25 @@ function GuestForm({ guest, categories, onClose, onSaved }: { guest: Guest | nul
             <option value="terkirim">Terkirim</option>
           </Select>
         </Field>
+        {events.length > 0 && (
+          <fieldset className="sm:col-span-2">
+            <legend className="text-sm font-medium">Diundang ke acara</legend>
+            <p className="mt-0.5 text-xs text-admin-muted">Kosongkan semua untuk mengundang ke semua acara.</p>
+            <div className="mt-2 grid gap-2 sm:grid-cols-2">
+              {events.map((e) => (
+                <label key={e.id} className="flex min-h-[40px] items-center gap-2 rounded-md border border-admin-line px-3 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={eventIds.includes(e.id)}
+                    onChange={(x) => setEventIds((cur) => (x.target.checked ? [...cur, e.id] : cur.filter((i) => i !== e.id)))}
+                    className="h-4 w-4 accent-[#454B40]"
+                  />
+                  {e.title}
+                </label>
+              ))}
+            </div>
+          </fieldset>
+        )}
         <Field label="Catatan internal" htmlFor="g-notes" className="sm:col-span-2" help="Hanya terlihat di dashboard.">
           <Textarea id="g-notes" rows={2} {...register("notes")} />
         </Field>
@@ -367,8 +446,8 @@ const pick = (row: Record<string, string>, keys: string[]) => {
   return "";
 };
 
-function ImportDialog({ open, onClose, onDone }: { open: boolean; onClose: () => void; onDone: () => void }) {
-  const [rows, setRows] = useState<{ name: string; category: string; whatsapp: string | null; max_pax: number; notes: string }[]>([]);
+function ImportDialog({ open, onClose, onDone, events }: { open: boolean; onClose: () => void; onDone: () => void; events: EventLite[] }) {
+  const [rows, setRows] = useState<{ name: string; category: string; whatsapp: string | null; max_pax: number; notes: string; event_ids?: string[] | null }[]>([]);
   const [problems, setProblems] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
   const input = useRef<HTMLInputElement>(null);
@@ -396,7 +475,15 @@ function ImportDialog({ open, onClose, onDone }: { open: boolean; onClose: () =>
             max_pax: pick(r, ["maks_orang", "max_pax", "maks", "jumlah"]) || "2",
             notes: pick(r, ["catatan", "notes"]),
           });
-          if (parsed.success) ok.push({ ...parsed.data, whatsapp: parsed.data.whatsapp || null });
+          // Kolom "acara": judul acara dipisah titik koma, misalnya "Akad Nikah; Resepsi Sesi 1".
+          const acara = pick(r, ["acara", "sesi", "events"]);
+          const titles = acara ? acara.split(/[;|]/).map((x) => x.trim().toLowerCase()).filter(Boolean) : [];
+          const ids = events.filter((e) => titles.includes(e.title.trim().toLowerCase())).map((e) => e.id);
+          if (events.length && titles.length && ids.length !== titles.length) {
+            bad.push(`Baris ${i + 2}: nama acara tidak dikenali (${acara}). Gunakan judul persis seperti di menu Konten.`);
+            return;
+          }
+          if (parsed.success) ok.push({ ...parsed.data, whatsapp: parsed.data.whatsapp || null, ...(events.length ? { event_ids: ids.length ? ids : null } : {}) });
           else bad.push(`Baris ${i + 2}: ${parsed.error.issues[0]?.message}`);
         });
         setRows(ok);
@@ -438,7 +525,9 @@ function ImportDialog({ open, onClose, onDone }: { open: boolean; onClose: () =>
         <>
           <Button
             onClick={() =>
-              downloadText("contoh-daftar-tamu.csv", "﻿nama,kategori,whatsapp,maks_orang,catatan\nBudi Santoso,Keluarga,081234567890,2,\nSari Wulandari,Teman Kantor,,1,Meja VIP\n", "text/csv")
+              downloadText("contoh-daftar-tamu.csv", events.length
+                ? `\uFEFFnama,kategori,whatsapp,maks_orang,catatan,acara\nBudi Santoso,Keluarga,081234567890,2,,${events.map((e) => e.title).join("; ")}\nSari Wulandari,Teman Kantor,,1,Meja VIP,${events[events.length - 1].title}\n`
+                : "\uFEFFnama,kategori,whatsapp,maks_orang,catatan\nBudi Santoso,Keluarga,081234567890,2,\nSari Wulandari,Teman Kantor,,1,Meja VIP\n", "text/csv")
             }
           >
             Unduh contoh
@@ -459,6 +548,66 @@ function ImportDialog({ open, onClose, onDone }: { open: boolean; onClose: () =>
               <li key={p}>{p}</li>
             ))}
           </ul>
+        </div>
+      )}
+    </Dialog>
+  );
+}
+
+function BulkEventsDialog({ categories, events, onClose, onDone }: { categories: string[]; events: EventLite[]; onClose: () => void; onDone: () => void }) {
+  const [cat, setCat] = useState(categories[0] ?? "");
+  const [ids, setIds] = useState<string[]>([]);
+  const [busy, setBusy] = useState(false);
+  const toast = useToast();
+  async function apply() {
+    if (!cat) return;
+    setBusy(true);
+    const value = ids.length && ids.length < events.length ? ids : null;
+    const { error, count } = await db().from("guests").update({ event_ids: value }, { count: "exact" }).eq("category", cat);
+    setBusy(false);
+    if (error) return toast("error", errMessage(error));
+    toast("ok", `${count ?? 0} tamu di kategori ${cat} diperbarui.`);
+    onDone();
+    onClose();
+  }
+  return (
+    <Dialog
+      open
+      onClose={onClose}
+      title="Atur acara per kategori"
+      description="Semua tamu di kategori terpilih akan diundang ke acara yang dicentang. Pengaturan per tamu bisa diubah lagi lewat Edit."
+      footer={
+        <>
+          <Button onClick={onClose}>Batal</Button>
+          <Button variant="primary" loading={busy} onClick={apply} disabled={!cat}>
+            Terapkan
+          </Button>
+        </>
+      }
+    >
+      {events.length === 0 ? (
+        <p className="text-sm text-admin-muted">Belum ada acara. Tambahkan acara di menu Konten &gt; Rangkaian Acara.</p>
+      ) : (
+        <div className="space-y-4">
+          <Field label="Kategori tamu" htmlFor="bulk-cat">
+            <Select id="bulk-cat" value={cat} onChange={(e) => setCat(e.target.value)}>
+              {categories.map((c) => (
+                <option key={c}>{c}</option>
+              ))}
+            </Select>
+          </Field>
+          <fieldset>
+            <legend className="text-sm font-medium">Acara</legend>
+            <p className="mt-0.5 text-xs text-admin-muted">Kosongkan semua atau centang semua = semua acara.</p>
+            <div className="mt-2 grid gap-2">
+              {events.map((e) => (
+                <label key={e.id} className="flex min-h-[40px] items-center gap-2 rounded-md border border-admin-line px-3 text-sm">
+                  <input type="checkbox" className="h-4 w-4 accent-[#454B40]" checked={ids.includes(e.id)} onChange={(x) => setIds((cur) => (x.target.checked ? [...cur, e.id] : cur.filter((i) => i !== e.id)))} />
+                  {e.title}
+                </label>
+              ))}
+            </div>
+          </fieldset>
         </div>
       )}
     </Dialog>

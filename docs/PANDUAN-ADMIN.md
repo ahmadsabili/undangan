@@ -91,6 +91,28 @@ Isi pesan diatur di menu **Template WhatsApp**. Variabel yang tersedia: `{nama_t
 - **Batas waktu RSVP** dan **maksimum orang** diatur di **Pengaturan**. Batas per tamu terdaftar diatur di Daftar Tamu.
 - **Ucapan**: setujui, sembunyikan, atau hapus. Sakelar **Moderasi otomatis** menentukan apakah ucapan baru langsung tampil. Ucapan yang mengandung tautan atau kata terlarang selalu menunggu persetujuan.
 
+## 6b. Fitur tambahan (opsional)
+
+Buka **Pengaturan > Fitur tambahan**. Ketiganya bawaan nonaktif dan berlaku langsung tanpa Publish.
+
+**Undangan per acara / sesi.** Untuk acara yang tidak terbuka bagi semua tamu, misalnya akad hanya keluarga atau resepsi dua sesi.
+1. Buat acaranya di **Konten > Rangkaian Acara**. Isi **Kapasitas** bila ingin dipantau.
+2. Di **Daftar Tamu**, klik **Atur acara per kategori**, atau centang acara di form Edit tamu. Tamu tanpa centang melihat semua acara.
+3. Saat import CSV, tambahkan kolom `acara` berisi judul acara dipisah titik koma, misalnya `Akad Nikah; Resepsi Sesi 1`.
+4. Pakai `{acara_tamu}` di template WhatsApp agar pesan menyebut acara, jam, dan tempat milik tamu itu.
+5. **Ringkasan** menampilkan jumlah diundang dan hadir per acara.
+
+**Status "sudah dibuka".** Kolom **Dibuka** muncul di Daftar Tamu. Filter **Terkirim, belum dibuka** untuk mengirim pengingat. Hanya tautan berkode yang tercatat.
+
+**Check-in hari H.**
+1. Aktifkan fiturnya beberapa hari sebelum acara.
+2. Buat akun untuk tiap penerima tamu: `npm run create-admin -- petugas1@email.com "password" checkin`. Akun petugas hanya bisa membuka halaman check-in.
+3. Di hari H, petugas membuka `domain-anda/admin/login` di ponselnya, login, dan otomatis masuk ke halaman **Check-in**.
+4. Tekan **Buka kamera** lalu arahkan ke QR undangan tamu (dari WhatsApp atau undangan cetak). Bila tamu tidak membawa QR, cari namanya.
+5. Sesuaikan jumlah orang, tekan **Check-in sekarang**. Salah catat? Tekan **Batalkan check-in**.
+6. Tamu yang tidak ada di daftar: **Tamu tanpa undangan terdaftar**.
+7. Uji sekali sebelum hari H dengan satu tamu contoh, termasuk izin kamera di ponsel petugas. Siapkan koneksi internet yang stabil di meja penerima tamu.
+
 ## 7. Preview
 
 Menu **Preview** menampilkan draft dalam bingkai ponsel, tablet, atau desktop. Isi **Nama tamu contoh** untuk melihat cover dengan nama tertentu. Formulir di mode preview tidak menyimpan data.

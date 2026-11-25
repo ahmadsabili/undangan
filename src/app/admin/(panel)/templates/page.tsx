@@ -4,12 +4,13 @@ import { Plus, Star, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { CopyInline } from "@/components/admin/ShareDialogs";
 import { siteOrigin, type Template } from "@/components/admin/useInviteContext";
+import { useEventsList } from "@/components/admin/useEventsList";
 import { Badge, Button, Card, EmptyState, ErrorState, Field, Input, LoadingBlock, PageHeader, Textarea, useConfirm, useToast } from "@/components/ui";
 import { cn, fillTemplate, nameLink } from "@/lib/utils";
 import { db, errMessage } from "@/services/admin";
 import { normalizeCouple, orderedCouple } from "@/services/normalize";
 
-const VARS = ["{nama_tamu}", "{nama_mempelai_1}", "{nama_mempelai_2}", "{link_undangan}"];
+const VARS = ["{nama_tamu}", "{nama_mempelai_1}", "{nama_mempelai_2}", "{link_undangan}", "{acara_tamu}"];
 
 export default function TemplatesPage() {
   const [list, setList] = useState<Template[] | null>(null);
@@ -19,6 +20,7 @@ export default function TemplatesPage() {
   const [busy, setBusy] = useState(false);
   const toast = useToast();
   const confirm = useConfirm();
+  const ev = useEventsList();
 
   const load = useCallback(async () => {
     setError(null);
@@ -76,7 +78,7 @@ export default function TemplatesPage() {
 
   if (error) return <ErrorState message={error} onRetry={load} />;
   if (!list) return <LoadingBlock rows={4} />;
-  const sample = current ? fillTemplate(current.body, { nama_tamu: "Bapak Budi Santoso", nama_mempelai_1: names[0], nama_mempelai_2: names[1], link_undangan: nameLink(siteOrigin(), "Bapak Budi Santoso") }) : "";
+  const sample = current ? fillTemplate(current.body, { nama_tamu: "Bapak Budi Santoso", nama_mempelai_1: names[0], nama_mempelai_2: names[1], link_undangan: nameLink(siteOrigin(), "Bapak Budi Santoso"), acara_tamu: ev.describe(null) }) : "";
 
   return (
     <>
@@ -123,7 +125,7 @@ export default function TemplatesPage() {
                     <Textarea id="t-body" rows={16} value={current.body} onChange={(e) => setCurrent({ ...current, body: e.target.value })} />
                   </Field>
                   <div>
-                    <p className="text-xs text-admin-muted">Variabel (klik untuk menyisipkan di akhir):</p>
+                    <p className="text-xs text-admin-muted">Variabel (klik untuk menyisipkan di akhir). {"{acara_tamu}"} berisi daftar acara, jam, dan tempat milik tamu itu; cocok untuk pesan pengingat.</p>
                     <div className="mt-1 flex flex-wrap gap-1">
                       {VARS.map((v) => (
                         <button key={v} type="button" onClick={() => setCurrent({ ...current, body: current.body + v })} className="rounded border border-admin-line bg-white px-2 py-1 font-mono text-xs hover:bg-[#F0EEE8]">

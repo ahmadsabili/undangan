@@ -5,6 +5,8 @@ import { useCallback, useEffect, useState } from "react";
 import { Card, EmptyState, ErrorState, LoadingBlock, PageHeader } from "@/components/ui";
 import { relativeTime } from "@/lib/date";
 import { db } from "@/services/admin";
+import { useFeatures } from "@/components/admin/useFeatures";
+import { useEventsList } from "@/components/admin/useEventsList";
 
 type Stats = {
   guests_total: number;
@@ -141,6 +143,8 @@ export default function OverviewPage() {
         </Card>
       </div>
 
+      <FeatureCards />
+
       <Card title="Aktivitas terbaru" className="mt-6">
         {activity.length === 0 ? (
           <EmptyState title="Belum ada aktivitas" body="RSVP dan ucapan dari tamu akan muncul di sini." />
@@ -161,5 +165,94 @@ export default function OverviewPage() {
         )}
       </Card>
     </>
+  );
+}
+
+type GuestLite = { event_ids: string[] | null; invitation_status: string; opened_at: string | null; checked_in_at: string | null; checked_in_pax: number | null; rsvps: { attendance: string; pax: number } | null };
+
+// Kartu tambahan yang hanya tampil bila fiturnya aktif.
+function FeatureCards() {
+  const { features } = useFeatures();
+  const { events } = useEventsList();
+  const [guests, setGuests] = useState<GuestLite[] | null>(null);
+  const any = features && (features.sessions || features.open_tracking || features.checkin);
+  useEffect(() => {
+    if (!any) return;
+    db()
+      .from("guests")
+      .select("event_ids, invitation_status, opened_at, checked_in_at, checked_in_pax, rsvps(attendance, pax)")
+      .then(({ data }) => setGuests((data as unknown as GuestLite[]) ?? []));
+  }, [any]);
+  if (!features || !any) return null;
+  if (!guests) return <div className="mt-6"><LoadingBlock rows={2} /></div>;
+
+  const sent = guests.filter((g) => g.invitation_status === "terkirim");
+  const opened = sent.filter((g) => g.opened_at).length;
+  const checked = guests.filter((g) => g.checked_in_at);
+  const checkedPax = checked.reduce((n, g) => n + (g.checked_in_pax ?? 0), 0);
+  const expectedPax = guests.reduce((n, g) => n + (g.rsvps?.attendance === "hadir" ? g.rsvps.pax : 0), 0);
+
+  return (
+    <div className="mt-6 grid gap-6 lg:grid-cols-2">
+      {features.sessions && (
+        <Card title="Per acara / sesi" description="Tamu terdaftar yang diundang dan orang yang menyatakan hadir">
+          {events.length === 0 ? (
+            <EmptyState title="Belum ada acara" />
+          ) : (
+            <div className="-mx-5 overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-y border-admin-line bg-[#FAF9F6] text-left text-xs text-admin-muted">
+                    <th scope="col" className="px-5 py-2 font-medium">Acara</th>
+                    <th scope="col" className="px-3 py-2 text-right font-medium">Diundang</th>
+                    <th scope="col" className="px-3 py-2 text-right font-medium">Hadir (orang)</th>
+                    <th scope="col" className="px-5 py-2 text-right font-medium">Kapasitas</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {events.map((e) => {
+                    const inv = guests.filter((g) => !g.event_ids?.length || g.event_ids.includes(e.id));
+                    const pax = inv.reduce((n, g) => n + (g.rsvps?.attendance === "hadir" ? g.rsvps.pax : 0), 0);
+                    const over = e.capacity != null && pax > e.capacity;
+                    return (
+                      <tr key={e.id} className="border-b border-admin-line last:border-0">
+                        <td className="px-5 py-2.5">{e.title}</td>
+                        <td className="px-3 py-2.5 text-right tabular-nums">{inv.length}</td>
+                        <td className={`px-3 py-2.5 text-right tabular-nums ${over ? "font-semibold text-admin-danger" : ""}`}>{pax}</td>
+                        <td className="px-5 py-2.5 text-right tabular-nums text-admin-muted">{e.capacity ?? "-"}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </Card>
+      )}
+      {features.open_tracking && (
+        <Card title="Undangan dibuka" description="Dari undangan yang ditandai terkirim">
+          <p className="text-3xl font-semibold tabular-nums">
+            {opened} <span className="text-base font-normal text-admin-muted">dari {sent.length}</span>
+          </p>
+          <div className="mt-3 h-2.5 rounded-full bg-[#EEECE6]">
+            <div className="h-full rounded-full bg-admin-brand" style={{ width: sent.length ? `${(opened / sent.length) * 100}%` : 0 }} />
+          </div>
+          <p className="mt-3 text-sm text-admin-muted">
+            {sent.length - opened} tamu belum membuka. Filter <em>Terkirim, belum dibuka</em> di Daftar Tamu untuk mengirim pengingat.
+          </p>
+        </Card>
+      )}
+      {features.checkin && (
+        <Card title="Check-in hari H" description="Kehadiran tercatat dibanding RSVP hadir">
+          <p className="text-3xl font-semibold tabular-nums">
+            {checkedPax} <span className="text-base font-normal text-admin-muted">orang dari estimasi {expectedPax}</span>
+          </p>
+          <p className="mt-1 text-sm text-admin-muted">{checked.length} undangan sudah check-in</p>
+          <Link href="/checkin" className="mt-4 inline-flex min-h-[40px] items-center rounded-md bg-admin-brand px-4 text-sm font-medium text-white hover:bg-[#363b32]">
+            Buka halaman check-in
+          </Link>
+        </Card>
+      )}
+    </div>
   );
 }

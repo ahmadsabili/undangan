@@ -27,7 +27,7 @@ function diff(target: number, now: number) {
 }
 
 export function Countdown({ section, folio }: { section: Section<Content>; folio: number }) {
-  const { data, t, mode } = useInvitation();
+  const { data, t, mode, guest } = useInvitation();
   const { wide } = useLayout();
   const s = data.settings;
   const target = new Date(s.wedding_date).getTime();
@@ -94,7 +94,7 @@ export function Countdown({ section, folio }: { section: Section<Content>; folio
               {t.googleCal}
             </InvLink>
             {mode === "public" ? (
-              <InvLink href="/api/calendar" variant="outline" download="undangan.ics">
+              <InvLink href={guest.code ? `/api/calendar?guest=${encodeURIComponent(guest.code)}` : "/api/calendar"} variant="outline" download="undangan.ics">
                 <Download className="h-4 w-4" aria-hidden="true" />
                 {t.icsCal}
               </InvLink>

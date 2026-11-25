@@ -11,6 +11,7 @@ import {
   MessageSquareHeart,
   Palette,
   PanelsTopLeft,
+  ScanLine,
   Settings,
   UserCog,
   Users,
@@ -36,6 +37,7 @@ const NAV = [
     { href: "/admin/rsvp", label: "RSVP", icon: MailCheck },
     { href: "/admin/wishes", label: "Ucapan", icon: MessageSquareHeart },
     { href: "/admin/templates", label: "Template WhatsApp", icon: Mail },
+    { href: "/checkin", label: "Check-in Hari H", icon: ScanLine },
   ] },
   { group: "Sistem", items: [
     { href: "/admin/settings", label: "Pengaturan", icon: Settings },

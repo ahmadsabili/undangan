@@ -13,6 +13,7 @@ export default async function PanelLayout({ children }: { children: React.ReactN
   if (!data.user) redirect("/admin/login");
   const { data: profile } = await supabase.from("profiles").select("role, email").eq("id", data.user.id).maybeSingle();
 
+  if (profile?.role === "checkin") redirect("/checkin");
   if (profile?.role !== "admin") {
     return (
       <main className="grid min-h-[100dvh] place-items-center px-6">

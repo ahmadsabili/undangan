@@ -1,4 +1,5 @@
-// Membuat (atau mempromosikan) akun admin. Tidak ada registrasi publik.
+// Membuat (atau mempromosikan) akun admin atau petugas check-in. Tidak ada registrasi publik.
+// Petugas check-in: tambahkan argumen ketiga `checkin`.
 // Pemakaian:
 //   npm run create-admin -- email@contoh.com "PasswordKuat123"
 // Membaca NEXT_PUBLIC_SUPABASE_URL dan SUPABASE_SERVICE_ROLE_KEY dari .env.local / environment.
@@ -13,7 +14,8 @@ for (const f of [".env.local", ".env"]) {
   }
 }
 
-const [email, password] = process.argv.slice(2);
+const [email, password, roleArg] = process.argv.slice(2);
+const role = roleArg === "checkin" ? "checkin" : "admin";
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
@@ -22,7 +24,7 @@ if (!url || !key) {
   process.exit(1);
 }
 if (!email || !password || password.length < 10) {
-  console.error('Pemakaian: npm run create-admin -- email@contoh.com "password minimal 10 karakter"');
+  console.error('Pemakaian: npm run create-admin -- email@contoh.com "password minimal 10 karakter" [checkin]');
   process.exit(1);
 }
 
@@ -48,14 +50,14 @@ if (created.error) {
     console.error("User sudah terdaftar tetapi tidak ditemukan.");
     process.exit(1);
   }
-  console.log("User sudah ada, password tidak diubah. Mempromosikan menjadi admin...");
+  console.log(`User sudah ada, password tidak diubah. Mengatur peran menjadi ${role}...`);
 } else {
   userId = created.data.user.id;
 }
 
-const { error } = await supabase.from("profiles").upsert({ id: userId, email, role: "admin" }, { onConflict: "id" });
+const { error } = await supabase.from("profiles").upsert({ id: userId, email, role }, { onConflict: "id" });
 if (error) {
-  console.error("Gagal mengatur role admin:", error.message);
+  console.error("Gagal mengatur peran:", error.message);
   process.exit(1);
 }
-console.log(`Selesai. ${email} sekarang admin. Masuk di /admin/login`);
+console.log(role === "checkin" ? `Selesai. ${email} sekarang petugas check-in. Masuk di /admin/login, lalu otomatis diarahkan ke /checkin.` : `Selesai. ${email} sekarang admin. Masuk di /admin/login`);

@@ -110,6 +110,7 @@ export interface Section<C = Record<string, unknown>> {
 
 export interface WeddingEvent {
   id: string;
+  capacity?: number | null;
   title: string;
   event_date: string; // YYYY-MM-DD
   start_time: string; // HH:MM
@@ -171,6 +172,16 @@ export interface GuestContext {
   code: string | null;
   maxPax: number;
   rsvp: { attendance: Attendance; pax: number; message: string } | null;
+  /** Acara yang boleh dilihat tamu ini (fitur sesi). null = semua acara. */
+  eventIds: string[] | null;
 }
 
 export type Attendance = "hadir" | "tidak_hadir" | "ragu";
+
+export interface FeatureFlags {
+  sessions: boolean;
+  open_tracking: boolean;
+  checkin: boolean;
+}
+
+export const DEFAULT_FEATURES: FeatureFlags = { sessions: false, open_tracking: false, checkin: false };

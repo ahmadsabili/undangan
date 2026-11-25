@@ -27,7 +27,7 @@ export default async function PreviewPage({ searchParams }: Props) {
   return (
     <>
       <ThemeAssets data={res.data} />
-      <Invitation data={res.data} guest={{ name, code: null, maxPax: res.data.settings.rsvp_max_pax, rsvp: null }} mode="preview" startOpen={params.open === "1"} />
+      <Invitation data={res.data} guest={{ name, code: null, maxPax: res.data.settings.rsvp_max_pax, rsvp: null, eventIds: null }} mode="preview" startOpen={params.open === "1"} />
     </>
   );
 }
