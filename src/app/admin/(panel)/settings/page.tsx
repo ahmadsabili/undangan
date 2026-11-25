@@ -122,7 +122,7 @@ export default function SettingsPage() {
   return (
     <>
       <PageHeader title="Pengaturan" description="Informasi umum, SEO, musik, dan aturan RSVP. Tersimpan sebagai draft sampai Anda Publish." actions={saveBar} />
-      <div className="grid gap-6">
+      <div className="grid grid-cols-1 gap-6">
         <Card title="Status publikasi" description="Berlaku langsung, tidak perlu Publish.">
           <Switch label={row.is_published ? "Undangan online" : "Undangan offline"} description="Saat offline, tautan undangan menampilkan pesan bahwa undangan belum tersedia." checked={row.is_published} disabled={pubBusy} onChange={togglePublished} />
         </Card>
@@ -292,9 +292,9 @@ function FeatureToggles() {
                   }
                 }}
               >
-                <option value="open">Semua orang yang punya alamat undangan</option>
-                <option value="link">Hanya lewat tautan tamu (kode atau tautan nama)</option>
-                <option value="code">Hanya tamu terdaftar (tautan berkode)</option>
+                <option value="open">Semua orang (bawaan)</option>
+                <option value="link">Wajib tautan tamu</option>
+                <option value="code">Hanya tamu terdaftar</option>
               </Select>
             </Field>
           </div>

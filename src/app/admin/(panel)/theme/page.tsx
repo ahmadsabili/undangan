@@ -135,7 +135,7 @@ export default function ThemePage() {
         }
       />
 
-      <div className="grid gap-6">
+      <div className="grid grid-cols-1 gap-6">
         <Card title="Template tata letak" description="Mengubah susunan dan komposisi seluruh undangan. Warna, font, dan konten tidak berubah.">
           <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {LAYOUTS.map((l) => {
@@ -204,7 +204,7 @@ export default function ThemePage() {
         </Card>
 
         <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
-          <div className="grid gap-6">
+          <div className="grid grid-cols-1 gap-6">
             <Card title="Warna" description="Pilih palet siap pakai, lalu sesuaikan tiap warna bila perlu. Palet hanya mengganti warna; font dan gaya tetap.">
               <div className="space-y-4">
                 {PALETTE_GROUPS.map((g) => (
