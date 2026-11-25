@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { db } from "@/services/admin";
-import { DEFAULT_FEATURES, type FeatureFlags } from "@/types/invitation";
+import { DEFAULT_FEATURES, type FeatureFlags, type FeatureToggleKey } from "@/types/invitation";
 
 /** Sakelar fitur opsional (berlaku langsung, tidak lewat draft/publish). */
 export function useFeatures() {
@@ -25,7 +25,7 @@ export function useFeatures() {
   }, [load]);
 
   const setFeature = useCallback(
-    async (name: keyof FeatureFlags, value: boolean) => {
+    async <K extends FeatureToggleKey | "access">(name: K, value: FeatureFlags[K]) => {
       const next = { ...(features ?? DEFAULT_FEATURES), [name]: value };
       const { error } = await db().from("wedding_settings").update({ features: next }).eq("id", 1);
       if (error) throw new Error(error.message);

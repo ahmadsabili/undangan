@@ -46,6 +46,7 @@ Website undangan pernikahan satu halaman dengan dashboard admin. Seluruh konten,
 - Editor tema: 16 preset (6 dari database + 10 bawaan aplikasi, termasuk tema gelap Noir Deco, Emerald Royale, Bordeaux Luxe, Midnight Glam), 20 palet warna cepat (netral, pastel, gelap mewah), warna, font, ukuran huruf, radius, gaya tombol & navigasi, intensitas animasi, overlay foto, latar per section, cek kontras otomatis.
 - Media library: upload banyak file, kompresi WebP, alt text, titik fokus, ganti file tanpa merusak referensi, penghapusan aman.
 - Daftar tamu: CRUD, cari, filter, import/export CSV, tautan berkode unik, QR code, pesan WhatsApp siap kirim.
+- **Undangan pribadi** (opsional): alamat utama tanpa tautan tamu ditolak. Pilih wajib tautan tamu (kode atau `?to=Nama`) atau hanya kode tamu terdaftar. Konten juga dikunci di database dari kunci publik.
 - **Tautan pendek** `/u/KODE` untuk kartu cetak (selalu aktif) dan **RSVP manual oleh admin** untuk konfirmasi lewat telepon.
 - **Fitur opsional** (aktif/nonaktif di Pengaturan > Fitur tambahan, bawaan nonaktif):
   - **Undangan per acara/sesi**: tiap tamu hanya melihat acara yang ditujukan untuknya; atur per tamu, per kategori, atau lewat kolom `acara` di CSV. Variabel WhatsApp `{acara_tamu}`.
@@ -129,7 +130,8 @@ Bila Supabase belum diisi, halaman undangan menampilkan petunjuk konfigurasi, bu
    4. `supabase/migrations/20261125000004_layout_templates.sql`
    5. `supabase/migrations/20261126000005_guest_features.sql`
    6. `supabase/migrations/20261127000006_physical_invites.sql`
-   7. `supabase/seed.sql`
+   7. `supabase/migrations/20261128000007_private_access.sql`
+   8. `supabase/seed.sql`
 3. Buka **Authentication > Sign In / Providers > Email** dan **matikan "Allow new users to sign up"**. Akun admin dibuat lewat skrip, bukan pendaftaran.
 4. Cek **Storage**: bucket `media` (public) sudah dibuat oleh migration ketiga.
 
@@ -219,7 +221,7 @@ Saran: export konfigurasi sebelum perubahan besar dan seminggu sekali menjelang 
 
 ```bash
 npm run test:lib    # zona waktu, kalender, sanitasi, spam, kontras (16 pemeriksaan)
-npm run test:sql    # migration + seed + RLS + draft/publish + backup/restore + fitur tamu di PGlite (35 pemeriksaan)
+npm run test:sql    # migration + seed + RLS + draft/publish + backup/restore + fitur tamu di PGlite (36 pemeriksaan)
 npm run typecheck
 npm run lint
 npm run build

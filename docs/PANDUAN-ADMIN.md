@@ -120,6 +120,11 @@ Buka **Pengaturan > Fitur tambahan**. Ketiganya bawaan nonaktif dan berlaku lang
 
 **RSVP manual.** Tamu yang konfirmasi lewat telepon atau titip pesan: buka **RSVP** > **Catat RSVP manual**, atau klik ikon centang-papan di baris tamu pada Daftar Tamu. RSVP ini masuk ke rekap yang sama dan ditandai *dicatat admin*.
 
+**Undangan pribadi.** Di Pengaturan > Fitur tambahan, atur **Siapa yang bisa membuka undangan**:
+- *Semua orang yang punya alamat undangan* (bawaan).
+- *Hanya lewat tautan tamu*: alamat utama tanpa `?guest=` atau `?to=` menampilkan pesan "Undangan ini bersifat pribadi".
+- *Hanya tamu terdaftar*: hanya tautan berkode dari Daftar Tamu. Tautan cepat `?to=Nama` ikut ditolak, begitu juga RSVP dan ucapan tanpa kode. Pratinjau admin tetap berjalan.
+
 **Check-in hari H.**
 1. Aktifkan fiturnya beberapa hari sebelum acara.
 2. Buat akun untuk tiap penerima tamu: `npm run create-admin -- petugas1@email.com "password" checkin`. Akun petugas hanya bisa membuka halaman check-in.

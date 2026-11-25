@@ -6,7 +6,7 @@ import { Badge, Button, Card, ErrorState, Field, Input, LoadingBlock, PageHeader
 import { TIMEZONES, utcToZonedInput, zonedInputToIso } from "@/lib/date";
 import { db, emitDraftChanged, errMessage, setPublished } from "@/services/admin";
 import { useFeatures } from "@/components/admin/useFeatures";
-import type { FeatureFlags } from "@/types/invitation";
+import type { AccessMode, FeatureToggleKey } from "@/types/invitation";
 
 type Row = {
   site_name: string;
@@ -218,7 +218,7 @@ export default function SettingsPage() {
   );
 }
 
-const FEATURE_INFO: { key: keyof FeatureFlags; label: string; description: string }[] = [
+const FEATURE_INFO: { key: FeatureToggleKey; label: string; description: string }[] = [
   {
     key: "sessions",
     label: "Undangan per acara / sesi",
@@ -272,8 +272,39 @@ function FeatureToggles() {
               }}
             />
           ))}
+          <div className="border-t border-admin-line pt-5">
+            <Field label="Siapa yang bisa membuka undangan" htmlFor="access" help={ACCESS_HELP[features.access]}>
+              <Select
+                id="access"
+                value={features.access}
+                disabled={busy === "access" || Boolean(error)}
+                onChange={async (e) => {
+                  const v = e.target.value as AccessMode;
+                  setBusy("access");
+                  try {
+                    await setFeature("access", v);
+                    toast("ok", "Akses undangan diperbarui.");
+                  } catch (err) {
+                    toast("error", errMessage(err));
+                  } finally {
+                    setBusy(null);
+                  }
+                }}
+              >
+                <option value="open">Semua orang yang punya alamat undangan</option>
+                <option value="link">Hanya lewat tautan tamu (kode atau tautan nama)</option>
+                <option value="code">Hanya tamu terdaftar (tautan berkode)</option>
+              </Select>
+            </Field>
+          </div>
         </div>
       )}
     </Card>
   );
 }
+
+const ACCESS_HELP: Record<AccessMode, string> = {
+  open: "Alamat utama tanpa tautan tamu tetap bisa dibuka, dengan sapaan bawaan di sampul.",
+  link: "Alamat utama tanpa tautan tamu menampilkan pesan bahwa undangan bersifat pribadi. Tautan berkode dan tautan cepat ?to=Nama tetap bisa dibuka.",
+  code: "Hanya tautan berkode (?guest=KODE atau /u/KODE) dari Daftar Tamu yang bisa dibuka. Tautan cepat ?to=Nama dan kode yang salah ditolak, begitu juga RSVP dan ucapan tanpa kode.",
+};

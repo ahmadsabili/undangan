@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 // Layar status jujur saat undangan belum bisa ditampilkan.
-export function StatusScreen({ kind, message }: { kind: "not_configured" | "unpublished" | "error"; message?: string }) {
+export function StatusScreen({ kind, message }: { kind: "not_configured" | "unpublished" | "error" | "private"; message?: string }) {
   const copy = {
     not_configured: {
       title: "Supabase belum dikonfigurasi",
@@ -10,6 +10,10 @@ export function StatusScreen({ kind, message }: { kind: "not_configured" | "unpu
     unpublished: {
       title: "Undangan belum dipublikasikan",
       body: "Halaman ini akan tersedia setelah pemilik undangan menekan tombol Publish di dashboard.",
+    },
+    private: {
+      title: "Undangan ini bersifat pribadi",
+      body: "Silakan buka undangan melalui tautan yang dikirimkan khusus untuk Anda. Bila tautan Anda tidak berfungsi, hubungi pengirim undangan.",
     },
     error: {
       title: "Undangan sedang tidak dapat dimuat",
@@ -25,7 +29,7 @@ export function StatusScreen({ kind, message }: { kind: "not_configured" | "unpu
         {message && kind === "error" && process.env.NODE_ENV !== "production" && (
           <p className="mt-4 break-words font-mono text-xs text-[#8a2f22]">{message}</p>
         )}
-        {kind !== "error" && (
+        {(kind === "not_configured" || kind === "unpublished") && (
           <Link href="/admin" className="mt-8 inline-flex min-h-[44px] items-center border border-[#454B40] px-5 font-sans text-sm text-[#454B40] hover:bg-[#454B40] hover:text-white">
             Buka dashboard admin
           </Link>

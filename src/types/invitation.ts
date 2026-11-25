@@ -178,11 +178,17 @@ export interface GuestContext {
 
 export type Attendance = "hadir" | "tidak_hadir" | "ragu";
 
+/** open: siapa pun; link: wajib tautan tamu (kode atau ?to=Nama); code: hanya kode tamu terdaftar. */
+export type AccessMode = "open" | "link" | "code";
+
 export interface FeatureFlags {
   sessions: boolean;
   open_tracking: boolean;
   checkin: boolean;
   physical: boolean;
+  access: AccessMode;
 }
 
-export const DEFAULT_FEATURES: FeatureFlags = { sessions: false, open_tracking: false, checkin: false, physical: false };
+export type FeatureToggleKey = Exclude<keyof FeatureFlags, "access">;
+
+export const DEFAULT_FEATURES: FeatureFlags = { sessions: false, open_tracking: false, checkin: false, physical: false, access: "open" };

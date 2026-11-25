@@ -3,8 +3,9 @@ import { unstable_cache } from "next/cache";
 import { readFile } from "node:fs/promises";
 import { isSupabaseConfigured } from "@/lib/env";
 import { getPublicSupabase, getServerSupabase } from "@/lib/supabase/server";
+import { getServiceSupabase } from "@/lib/supabase/admin";
 import { normalizeInvitation } from "@/services/normalize";
-import type { GuestContext, InvitationData } from "@/types/invitation";
+import type { AccessMode, GuestContext, InvitationData } from "@/types/invitation";
 
 export const INVITATION_TAG = "invitation";
 
@@ -32,7 +33,8 @@ export function isFixtureMode() {
 
 const fetchPublished = unstable_cache(
   async () => {
-    const { data, error } = await getPublicSupabase().rpc("get_published_invitation");
+    // Service role: saat undangan pribadi, kunci publik tidak diberi konten oleh database.
+    const { data, error } = await (getServiceSupabase() ?? getPublicSupabase()).rpc("get_published_invitation");
     if (error) throw new Error(error.message);
     return data as unknown;
   },
@@ -64,6 +66,23 @@ export async function getDraftInvitation(): Promise<LoadResult> {
   if (error) return { status: "error", message: error.message };
   const parsed = normalizeInvitation(data);
   return parsed ? { status: "ok", data: parsed } : { status: "error", message: "Draft kosong." };
+}
+
+/** Mode akses undangan (berlaku langsung). Bila migration belum dijalankan: terbuka. */
+export async function getAccessMode(): Promise<AccessMode> {
+  if (!isSupabaseConfigured()) return "open";
+  const db = getServiceSupabase();
+  if (!db) return "open";
+  const { data, error } = await db.rpc("invitation_access");
+  if (error) return "open";
+  return data === "link" || data === "code" ? data : "open";
+}
+
+/** Apakah konteks tamu boleh membuka undangan pada mode akses ini. */
+export function guestAllowed(mode: AccessMode, guest: GuestContext, params: { to?: string | string[] }) {
+  if (mode === "open") return true;
+  if (guest.code) return true;
+  return mode === "link" && typeof params.to === "string" && params.to.trim().length > 0;
 }
 
 /** Bangun konteks tamu dari ?guest=KODE (diutamakan) atau ?to=Nama. */

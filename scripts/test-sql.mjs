@@ -162,6 +162,18 @@ await check("situs offline menyembunyikan snapshot", async () => {
   assert.equal(r.rows[0].s, null);
   await db.exec("update public.wedding_settings set is_published = true");
 });
+await check("mode akses pribadi: anon tidak bisa mengambil konten, service role bisa", async () => {
+  await db.exec(`update public.wedding_settings set features = features || '{"access": "code"}'`);
+  const anon = await as("anon", null, () => db.query("select public.get_published_invitation() as s"));
+  assert.equal(anon.rows[0].s, null);
+  const svc = await as("service_role", null, () => db.query("select public.get_published_invitation() as s, public.invitation_access() as a"));
+  assert.ok(svc.rows[0].s?.sections);
+  assert.equal(svc.rows[0].a, "code");
+  await assert.rejects(as("anon", null, () => db.query("select public.invitation_access()")));
+  await db.exec(`update public.wedding_settings set features = features || '{"access": "open"}'`);
+  const open = await as("anon", null, () => db.query("select public.get_published_invitation() as s"));
+  assert.ok(open.rows[0].s?.sections);
+});
 await check("ucapan pending tidak tampil, approved tampil", async () => {
   await db.exec(`insert into public.wedding_wishes (name, message, status) values ('A', 'Selamat ya', 'pending'), ('B', 'Barakallah', 'approved')`);
   const r = await as("anon", null, () => db.query("select public.get_public_wishes(10, 0) as w"));
@@ -209,7 +221,7 @@ await db.exec(`insert into auth.users (id, email) values ('${CHECKER}', 'petugas
                update public.profiles set role = 'checkin' where id = '${CHECKER}';`);
 await check("semua fitur bawaan nonaktif", async () => {
   const r = await db.query("select features from public.wedding_settings");
-  assert.deepEqual(r.rows[0].features, { sessions: false, open_tracking: false, checkin: false, physical: false });
+  assert.deepEqual(r.rows[0].features, { sessions: false, open_tracking: false, checkin: false, physical: false, access: "open" });
 });
 await check("fitur tidak ikut snapshot draft", async () => {
   const r = await as("authenticated", ADMIN, () => db.query("select public.get_draft_invitation() as s"));

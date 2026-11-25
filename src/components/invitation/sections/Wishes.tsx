@@ -37,11 +37,11 @@ export function Wishes({ section, folio }: { section: Section<Content>; folio: n
 
   const load = useCallback(
     async (offset: number) => {
-      const res = await fetch(`/api/wishes?limit=${pageSize}&offset=${offset}`, { cache: "no-store" });
+      const res = await fetch(`/api/wishes?limit=${pageSize}&offset=${offset}${guest.code ? `&guest=${encodeURIComponent(guest.code)}` : ""}`, { cache: "no-store" });
       if (!res.ok) throw new Error();
       return (await res.json()) as { items: Wish[]; total: number };
     },
-    [pageSize],
+    [pageSize, guest.code],
   );
 
   const initial = useCallback(() => {

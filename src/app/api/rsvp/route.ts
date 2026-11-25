@@ -3,6 +3,7 @@ import { clientKey } from "@/lib/ip";
 import { cleanText, spamReason } from "@/lib/sanitize";
 import { jsonError, prepare, rateLimited, readJson, sameOrigin } from "@/services/public-submit";
 import { rsvpSchema } from "@/validation/public";
+import { accessModeFor, validGuestCode } from "@/services/access";
 
 export const dynamic = "force-dynamic";
 
@@ -22,6 +23,7 @@ export async function POST(req: Request) {
   if (!ctx.ok) return ctx.response;
   const { db, published } = ctx;
   const s = published.settings;
+  if ((await accessModeFor(db)) === "code" && !(await validGuestCode(db, v.guestCode))) return jsonError("Undangan ini hanya untuk tamu yang menerima tautan pribadi.", 403);
 
   if (!published.sections.some((x) => x.key === "rsvp" && x.enabled)) return jsonError("Formulir RSVP sedang tidak aktif.", 403);
   if (s.rsvp_deadline && Date.now() > new Date(s.rsvp_deadline).getTime()) return jsonError("Konfirmasi kehadiran sudah ditutup.", 403);
