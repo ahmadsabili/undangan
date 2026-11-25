@@ -1,6 +1,6 @@
 "use client";
 
-import { AtSign as Instagram } from "lucide-react";
+import { Camera as Instagram } from "lucide-react";
 import { getMedia } from "@/lib/media";
 import { cn } from "@/lib/utils";
 import { orderedCouple } from "@/services/normalize";

@@ -1,6 +1,6 @@
 "use client";
 
-import { AtSign as Instagram } from "lucide-react";
+import { Camera as Instagram } from "lucide-react";
 import type { Section } from "@/types/invitation";
 import { useInvitation } from "../context";
 import { CopyButton } from "../CopyButton";
