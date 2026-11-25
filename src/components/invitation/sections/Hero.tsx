@@ -45,17 +45,17 @@ function HeroEditorial({ section, saveTheDateHref }: { section: Section<HeroCont
             <span>The Wedding</span>
           </p>
           <h1 id="hero-names" className="mt-6 font-heading text-[4.1rem] font-normal leading-[0.92] tracking-[-0.02em] sm:text-8xl">
-            <span className="block overflow-hidden pb-1">
+            <span className="-mx-[0.12em] -mt-[0.08em] block overflow-hidden px-[0.12em] pb-1 pt-[0.08em]">
               <motion.span className="block" {...line(0)}>
                 {p1.nickname}
               </motion.span>
             </span>
-            <span className="block overflow-hidden pb-1">
+            <span className="-mx-[0.12em] -mt-[0.08em] block overflow-hidden px-[0.12em] pb-1 pt-[0.08em]">
               <motion.span className="block pl-[0.9em] font-heading italic text-[0.7em] leading-[1.05]" style={{ color: "rgb(var(--tone-accent))" }} {...line(1)}>
                 &amp;
               </motion.span>
             </span>
-            <span className="block overflow-hidden pb-1">
+            <span className="-mx-[0.12em] -mt-[0.08em] block overflow-hidden px-[0.12em] pb-1 pt-[0.08em]">
               <motion.span className="block" {...line(2)}>
                 {p2.nickname}
               </motion.span>
