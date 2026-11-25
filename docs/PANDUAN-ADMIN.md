@@ -58,6 +58,16 @@ Tips per section:
 
 ## 4. Tampilan (menu Tema)
 
+**Template tata letak** mengubah susunan seluruh undangan. Pilih salah satu, lalu Simpan draft dan cek di Preview:
+
+| Template | Cocok untuk |
+| --- | --- |
+| Editorial | Gaya majalah modern, asimetris |
+| Klasik Simetris | Kesan kartu undangan cetak yang formal |
+| Sinematik Foto Penuh | Punya banyak foto prewedding bagus. Atur foto latar tiap section di menu Konten |
+| Kartu Minimal | Ringkas dan rapi, tampil seperti kartu di desktop |
+| Tradisional Nusantara | Nuansa adat. Motif kawung bawaan bisa diganti gambar ornamen sendiri |
+
 - Pilih salah satu dari 6 preset. Konten tidak berubah sama sekali.
 - Atur warna, font, ukuran huruf, sudut, gaya tombol, navigasi, animasi, dan kegelapan overlay foto.
 - Daftar **cek kontras** memberi peringatan bila kombinasi warna sulit dibaca.

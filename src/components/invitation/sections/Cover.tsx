@@ -7,6 +7,8 @@ import { getMedia } from "@/lib/media";
 import { orderedCouple } from "@/services/normalize";
 import type { Section } from "@/types/invitation";
 import { useInvitation } from "../context";
+import { MotifBand, MotifCorners, useLayout } from "../layout";
+import { cn } from "@/lib/utils";
 import { useReducedMotionSafe } from "../useReducedMotionSafe";
 import { Monogram } from "../Monogram";
 import { SmartImage } from "../SmartImage";
@@ -16,6 +18,7 @@ type CoverContent = { eyebrow?: string; greeting?: string; default_guest?: strin
 export function Cover({ section, onOpen }: { section: Section<CoverContent>; onOpen: () => void }) {
   const { data, guest, motion: m } = useInvitation();
   const reduce = useReducedMotionSafe() || !m.enabled;
+  const { layout } = useLayout();
   const s = data.settings;
   const c = section.content;
   const [p1, p2] = orderedCouple(s.couple);
@@ -33,10 +36,11 @@ export function Cover({ section, onOpen }: { section: Section<CoverContent>; onO
       role="dialog"
       aria-modal="true"
       aria-labelledby="cover-names"
-      className="fixed inset-0 z-50 flex h-[100dvh] w-full flex-col overflow-hidden bg-primary"
+      className={cn("fixed inset-0 z-50 flex h-[100dvh] w-full flex-col overflow-hidden", layout === "card" ? "bg-secondary md:py-10" : "bg-primary")}
       exit={reduce ? { opacity: 0 } : { opacity: 0, y: "-6%", transition: { duration: 1.1, ease: [0.65, 0, 0.35, 1] } }}
     >
-      {photo && <SmartImage media={photo} sizes="100vw" priority className="scale-[1.02]" />}
+      <div className={cn("relative flex w-full flex-1 flex-col overflow-hidden bg-primary", layout === "card" && "mx-auto md:max-w-[460px] md:rounded-[calc(var(--radius)+14px)]")}>
+      {photo && <SmartImage media={photo} sizes={layout === "card" ? "(min-width: 768px) 460px, 100vw" : "100vw"} priority className="scale-[1.02]" />}
       <div aria-hidden="true" className="absolute inset-0 bg-primary" style={{ opacity: "var(--overlay)" }} />
       <div
         aria-hidden="true"
@@ -44,7 +48,20 @@ export function Cover({ section, onOpen }: { section: Section<CoverContent>; onO
         style={{ background: "linear-gradient(180deg, rgb(var(--c-primary) / 0.15) 0%, rgb(var(--c-primary) / 0.35) 45%, rgb(var(--c-primary) / 0.86) 100%)" }}
       />
 
-      <div className="relative flex flex-1 flex-col items-center px-6 pb-safe pt-[max(2.5rem,env(safe-area-inset-top))] text-center" style={{ color: light }}>
+      {layout === "classic" && (
+        <div aria-hidden="true" className="pointer-events-none absolute inset-3 border p-[5px] sm:inset-6" style={{ borderColor: "rgb(var(--c-on-primary) / 0.55)" }}>
+          <div className="h-full border" style={{ borderColor: "rgb(var(--c-on-primary) / 0.3)" }} />
+        </div>
+      )}
+      {layout === "nusantara" && (
+        <>
+          <MotifBand className="absolute inset-x-0 top-0" />
+          <MotifBand className="absolute inset-x-0 bottom-0" />
+          <MotifCorners inset={22} size={52} />
+        </>
+      )}
+
+      <div className="relative flex flex-1 flex-col items-center px-8 pb-safe pt-[max(2.5rem,env(safe-area-inset-top))] text-center" style={{ color: light }}>
         <motion.div {...item(0)}>
           <Monogram size={78} />
         </motion.div>
@@ -83,6 +100,7 @@ export function Cover({ section, onOpen }: { section: Section<CoverContent>; onO
             </button>
           </motion.div>
         </div>
+      </div>
       </div>
     </motion.div>
   );

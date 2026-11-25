@@ -7,12 +7,15 @@ import { useInvitation } from "../context";
 import { Reveal } from "../Reveal";
 import { SectionFrame } from "../SectionFrame";
 import { SmartImage } from "../SmartImage";
+import { useLayout } from "../layout";
 
 // Timeline vertikal: garis rambut di tengah (desktop) atau kiri (ponsel),
 // tahapan bergantian sisi agar cerita terbaca seperti halaman majalah.
 export function Story({ section, folio }: { section: Section; folio: number }) {
   const { data } = useInvitation();
+  const { layout } = useLayout();
   if (!data.stories.length) return null;
+  if (layout !== "editorial") return <StoryCentered section={section} folio={folio} />;
   return (
     <SectionFrame section={section} folio={folio}>
       <ol className="relative mx-auto max-w-4xl">
@@ -40,6 +43,43 @@ export function Story({ section, folio }: { section: Section; folio: number }) {
                 )}
               </Reveal>
             </li>
+          );
+        })}
+      </ol>
+    </SectionFrame>
+  );
+}
+
+// Template selain Editorial: satu kolom rata tengah, tiap tahapan dipisah belah ketupat kecil.
+function StoryCentered({ section, folio }: { section: Section; folio: number }) {
+  const { data } = useInvitation();
+  const { layout } = useLayout();
+  const card = layout === "card";
+  return (
+    <SectionFrame section={section} folio={folio}>
+      <ol className={cn("mx-auto max-w-xl", card ? "text-left" : "text-center")}>
+        {data.stories.map((st, i) => {
+          const photo = getMedia(data, st.media_id);
+          return (
+            <Reveal as="li" key={st.id} className="relative pb-14 last:pb-0">
+              {i > 0 && (
+                <span aria-hidden="true" className={cn("mb-10 block h-2.5 w-2.5 rotate-45 border", !card && "mx-auto")} style={{ borderColor: "rgb(var(--c-accent))" }} />
+              )}
+              <p className="font-body text-xs font-medium tracking-[0.18em]" style={{ color: "rgb(var(--tone-accent))" }}>
+                {st.date_label}
+              </p>
+              <h3 className="mt-2 font-heading text-3xl leading-tight sm:text-4xl">{st.title}</h3>
+              {photo && (
+                <div className={cn("relative mt-5 aspect-[4/3] w-full overflow-hidden", !card && "mx-auto max-w-sm")} style={{ borderRadius: "var(--radius)" }}>
+                  <SmartImage media={photo} sizes="(min-width: 768px) 384px, 90vw" />
+                </div>
+              )}
+              {st.description && (
+                <p className={cn("mt-4 font-body leading-relaxed", !card && "mx-auto max-w-md")} style={{ color: "rgb(var(--tone-muted))" }}>
+                  {st.description}
+                </p>
+              )}
+            </Reveal>
           );
         })}
       </ol>

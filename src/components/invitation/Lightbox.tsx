@@ -3,7 +3,8 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import Image from "next/image";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import type { MediaAsset } from "@/types/invitation";
 import { useInvitation } from "./context";
 
@@ -23,6 +24,8 @@ export function Lightbox({
   const closeRef = useRef<HTMLButtonElement>(null);
   const touch = useRef<{ x: number; y: number } | null>(null);
   const open = index !== null;
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   const go = useCallback(
     (dir: number) => {
@@ -65,7 +68,9 @@ export function Lightbox({
 
   const current = index !== null ? items[index] : null;
 
-  return (
+  if (!mounted) return null;
+  // Portal ke body: section berfoto (template Sinematik) membuat stacking context sendiri.
+  return createPortal(
     <AnimatePresence>
       {open && current && (
         <motion.div
@@ -121,6 +126,7 @@ export function Lightbox({
           </div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body,
   );
 }

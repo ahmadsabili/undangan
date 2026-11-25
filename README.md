@@ -42,7 +42,8 @@ Website undangan pernikahan satu halaman dengan dashboard admin. Seluruh konten,
 - Login aman (Supabase Auth), tanpa registrasi publik, ganti password.
 - Ringkasan statistik: tamu, RSVP per status, estimasi orang hadir, per kategori, aktivitas terbaru.
 - Editor konten berbasis form, drag and drop urutan section, aktif/nonaktif, draft & publish, reset.
-- Editor tema: 6 preset (Modern Elegant, Classic Luxury, Botanical Garden, Minimalist Monochrome, Romantic Champagne, Editorial Wedding), warna, font, ukuran huruf, radius, gaya tombol & navigasi, intensitas animasi, overlay foto, latar per section, cek kontras otomatis.
+- **5 template tata letak**: Editorial, Klasik Simetris, Sinematik Foto Penuh, Kartu Minimal, Tradisional Nusantara (ornamen bisa diganti). Dipilih di menu Tema dan bisa dipadukan dengan preset warna mana pun.
+- Editor tema: 6 preset warna (Modern Elegant, Classic Luxury, Botanical Garden, Minimalist Monochrome, Romantic Champagne, Editorial Wedding), warna, font, ukuran huruf, radius, gaya tombol & navigasi, intensitas animasi, overlay foto, latar per section, cek kontras otomatis.
 - Media library: upload banyak file, kompresi WebP, alt text, titik fokus, ganti file tanpa merusak referensi, penghapusan aman.
 - Daftar tamu: CRUD, cari, filter, import/export CSV, tautan berkode unik, QR code, pesan WhatsApp siap kirim.
 - Template pesan WhatsApp yang bisa diedit.
@@ -119,7 +120,8 @@ Bila Supabase belum diisi, halaman undangan menampilkan petunjuk konfigurasi, bu
    1. `supabase/migrations/20261124000001_schema.sql`
    2. `supabase/migrations/20261124000002_functions.sql`
    3. `supabase/migrations/20261124000003_security.sql`
-   4. `supabase/seed.sql`
+   4. `supabase/migrations/20261125000004_layout_templates.sql`
+   5. `supabase/seed.sql`
 3. Buka **Authentication > Sign In / Providers > Email** dan **matikan "Allow new users to sign up"**. Akun admin dibuat lewat skrip, bukan pendaftaran.
 4. Cek **Storage**: bucket `media` (public) sudah dibuat oleh migration ketiga.
 
@@ -219,4 +221,4 @@ Daftar uji manual setelah deploy ada di [docs/PANDUAN-ADMIN.md](docs/PANDUAN-ADM
 - Font dimuat dari Google Fonts agar bisa diganti dari dashboard. Konsekuensinya ada satu permintaan ke `fonts.googleapis.com`.
 - Peta memakai embed Google Maps tanpa API key (mode pencarian alamat). Untuk titik yang presisi, isi tautan Google Maps di tiap acara/lokasi.
 - Skor Lighthouse belum diukur di lingkungan produksi. Ukur setelah deploy dengan foto asli.
-- Gambar latar per section belum didukung. Latar section memakai warna tema.
+- Foto latar per section hanya dipakai template Sinematik. Template lain memakai warna tema sebagai latar section.

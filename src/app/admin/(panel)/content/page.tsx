@@ -6,6 +6,7 @@ import { CollectionEditor } from "@/components/admin/CollectionEditor";
 import { CoupleEditor } from "@/components/admin/CoupleEditor";
 import { DynamicFields } from "@/components/admin/DynamicFields";
 import { GalleryEditor } from "@/components/admin/GalleryEditor";
+import { MediaField } from "@/components/admin/MediaPicker";
 import { SortableList } from "@/components/admin/Sortable";
 import { Badge, Button, Card, ErrorState, Field, Input, LoadingBlock, PageHeader, Select, Textarea, useToast } from "@/components/ui";
 import { EVENT_FIELDS, GIFT_FIELDS, STORY_FIELDS } from "@/config/collections";
@@ -187,6 +188,11 @@ function SectionEditor({ section, couple, timezone, onSaved }: { section: Sectio
                   </option>
                 ))}
               </Select>
+            </Field>
+          )}
+          {!["cover", "hero", "closing"].includes(section.key) && (
+            <Field label="Foto latar (template Sinematik)" help="Dipakai hanya bila template tata letak Sinematik aktif. Kosongkan untuk memakai foto galeri bergiliran.">
+              <MediaField label="foto latar section" value={draft.background_media_id} onChange={(v) => setDraft({ ...draft, background_media_id: v })} />
             </Field>
           )}
           {meta.fields.length > 0 && <DynamicFields fields={meta.fields} values={draft.content} timezone={timezone} prefix={section.key} onChange={(content) => setDraft({ ...draft, content })} />}

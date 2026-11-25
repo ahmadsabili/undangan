@@ -2,6 +2,8 @@ import type { CSSProperties } from "react";
 import type { SectionBackground, ThemeTokens } from "@/types/invitation";
 
 export const DEFAULT_THEME: ThemeTokens = {
+  layout: "editorial",
+  ornamentMediaId: null,
   colors: {
     primary: "#454B40",
     secondary: "#E7D8C5",
@@ -21,9 +23,12 @@ export const DEFAULT_THEME: ThemeTokens = {
 
 export function normalizeTheme(t: Partial<ThemeTokens> | null | undefined): ThemeTokens {
   const src = t ?? {};
+  const layouts = ["editorial", "classic", "cinematic", "card", "nusantara"];
   return {
     ...DEFAULT_THEME,
     ...src,
+    layout: layouts.includes(String(src.layout)) ? (src.layout as ThemeTokens["layout"]) : "editorial",
+    ornamentMediaId: src.ornamentMediaId ?? null,
     colors: { ...DEFAULT_THEME.colors, ...(src.colors ?? {}) },
     fonts: { ...DEFAULT_THEME.fonts, ...(src.fonts ?? {}) },
   };

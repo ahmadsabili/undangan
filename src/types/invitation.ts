@@ -51,7 +51,11 @@ export interface Couple {
   order: "first_second" | "second_first";
 }
 
+export type LayoutKey = "editorial" | "classic" | "cinematic" | "card" | "nusantara";
+
 export interface ThemeTokens {
+  layout: LayoutKey; // template tata letak
+  ornamentMediaId: string | null; // motif custom untuk template Nusantara
   colors: {
     primary: string;
     secondary: string;

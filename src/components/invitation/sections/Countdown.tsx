@@ -11,6 +11,7 @@ import { useInvitation } from "../context";
 import { InvButton, InvLink } from "../InvButton";
 import { Reveal } from "../Reveal";
 import { SectionFrame } from "../SectionFrame";
+import { useLayout } from "../layout";
 
 type Content = { after_message?: string };
 
@@ -27,6 +28,7 @@ function diff(target: number, now: number) {
 
 export function Countdown({ section, folio }: { section: Section<Content>; folio: number }) {
   const { data, t, mode } = useInvitation();
+  const { wide } = useLayout();
   const s = data.settings;
   const target = new Date(s.wedding_date).getTime();
   const [now, setNow] = useState<number | null>(null);
@@ -73,7 +75,7 @@ export function Countdown({ section, folio }: { section: Section<Content>; folio
             <div role="timer" aria-live="off" className="mt-12 grid grid-cols-4">
               {units.map(([label, value], i) => (
                 <div key={label} className={i ? "border-l" : ""} style={{ borderColor: "rgb(var(--c-accent) / 0.45)" }}>
-                  <span className="block font-heading text-[2.7rem] leading-none [font-variant-numeric:lining-nums_tabular-nums] sm:text-7xl">
+                  <span className={`block font-heading leading-none [font-variant-numeric:lining-nums_tabular-nums] ${wide("sm:text-7xl")} text-[2.7rem]`}>
                     {value === undefined ? "--" : String(value).padStart(2, "0")}
                   </span>
                   <span className="mt-3 block font-body text-[0.7rem] tracking-[0.18em]" style={{ color: "rgb(var(--tone-muted))" }}>

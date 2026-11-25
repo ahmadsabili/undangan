@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext } from "react";
-import type { GuestContext, InvitationData } from "@/types/invitation";
+import type { GuestContext, InvitationData, MediaAsset } from "@/types/invitation";
 import type { Dict } from "./i18n";
 
 export interface InvitationCtx {
@@ -10,6 +10,8 @@ export interface InvitationCtx {
   mode: "public" | "preview";
   t: Dict;
   motion: { distance: number; duration: number; enabled: boolean };
+  /** Foto latar per section untuk template Sinematik (id section -> media). */
+  photos: Record<string, MediaAsset | null>;
 }
 
 export const InvitationContext = createContext<InvitationCtx | null>(null);

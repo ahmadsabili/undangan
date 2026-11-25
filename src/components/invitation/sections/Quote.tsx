@@ -3,6 +3,7 @@
 import type { Section } from "@/types/invitation";
 import { Reveal } from "../Reveal";
 import { SectionFrame } from "../SectionFrame";
+import { SectionMark } from "../layout";
 
 type QuoteContent = { type?: string; arabic?: string; text?: string; source?: string };
 
@@ -13,9 +14,7 @@ export function Quote({ section, folio }: { section: Section<QuoteContent>; foli
     <SectionFrame section={s} folio={folio}>
       <figure className="mx-auto max-w-2xl text-center">
         <Reveal>
-          <p className="folio justify-center" style={{ color: "rgb(var(--tone-accent))" }}>
-            <span>No. {String(folio).padStart(2, "0")}</span>
-          </p>
+          <SectionMark folio={folio} />
         </Reveal>
         {c.type === "quran" && c.arabic && (
           <Reveal delay={0.1}>
