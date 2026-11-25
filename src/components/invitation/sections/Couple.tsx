@@ -1,6 +1,6 @@
 "use client";
 
-import { Camera as Instagram } from "lucide-react";
+import { FaInstagram as Instagram } from "react-icons/fa6";
 import { getMedia } from "@/lib/media";
 import { cn } from "@/lib/utils";
 import { orderedCouple } from "@/services/normalize";

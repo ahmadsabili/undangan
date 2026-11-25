@@ -1,6 +1,6 @@
 "use client";
 
-import { Camera as Instagram } from "lucide-react";
+import { FaInstagram as Instagram } from "react-icons/fa6";
 import type { Section } from "@/types/invitation";
 import { useInvitation } from "../context";
 import { CopyButton } from "../CopyButton";
