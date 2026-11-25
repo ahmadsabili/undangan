@@ -209,7 +209,7 @@ await db.exec(`insert into auth.users (id, email) values ('${CHECKER}', 'petugas
                update public.profiles set role = 'checkin' where id = '${CHECKER}';`);
 await check("semua fitur bawaan nonaktif", async () => {
   const r = await db.query("select features from public.wedding_settings");
-  assert.deepEqual(r.rows[0].features, { sessions: false, open_tracking: false, checkin: false });
+  assert.deepEqual(r.rows[0].features, { sessions: false, open_tracking: false, checkin: false, physical: false });
 });
 await check("fitur tidak ikut snapshot draft", async () => {
   const r = await as("authenticated", ADMIN, () => db.query("select public.get_draft_invitation() as s"));
@@ -268,6 +268,24 @@ await check("petugas check-in tidak bisa membaca tabel tamu / pengaturan", async
 });
 await check("pengguna biasa tidak bisa check-in", async () => {
   await assert.rejects(as("authenticated", VIEWER, () => db.query("select public.checkin_lookup('Sari')")), /Akses ditolak/);
+});
+
+await check("jenis undangan: bawaan digital, nilai tak dikenal ditolak", async () => {
+  const r = await db.query("select invite_type from public.guests where name = 'Sari'");
+  assert.equal(r.rows[0].invite_type, "digital");
+  await as("authenticated", ADMIN, () => db.query("update public.guests set invite_type = 'fisik' where name = 'Sari'"));
+  await assert.rejects(db.query("update public.guests set invite_type = 'surat' where name = 'Sari'"));
+});
+await check("check-in mengenali QR tautan pendek /u/KODE", async () => {
+  const r = await as("authenticated", CHECKER, () => db.query("select public.checkin_lookup($1) as r", [`https://contoh.com/u/${code.toLowerCase()}`]));
+  assert.equal(r.rows[0].r[0].name, "Sari");
+});
+await check("admin bisa mencatat RSVP manual untuk tamu", async () => {
+  const g = (await db.query("select id, name from public.guests where name = 'Budi Santoso'")).rows[0];
+  await as("authenticated", ADMIN, () =>
+    db.query("insert into public.rsvps (guest_id, name, attendance, pax, source) values ($1, $2, 'hadir', 2, 'admin') on conflict (guest_id) do update set attendance = excluded.attendance, pax = excluded.pax, source = 'admin'", [g.id, g.name]));
+  const r = await db.query("select source, pax from public.rsvps where guest_id = $1", [g.id]);
+  assert.deepEqual(r.rows[0], { source: "admin", pax: 2 });
 });
 
 console.log("\nservice role");

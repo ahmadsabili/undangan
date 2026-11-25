@@ -1,6 +1,7 @@
 "use client";
 
-import { Download, Pencil, Search, Trash2 } from "lucide-react";
+import { Download, Pencil, Plus, Search, Trash2 } from "lucide-react";
+import { ManualRsvpDialog } from "@/components/admin/ManualRsvpDialog";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Badge, Button, Card, Dialog, EmptyState, ErrorState, Field, Input, LoadingBlock, PageHeader, Select, Textarea, useConfirm, useToast } from "@/components/ui";
@@ -32,6 +33,7 @@ export default function RsvpPage() {
   const [att, setAtt] = useState("");
   const [cat, setCat] = useState("");
   const [edit, setEdit] = useState<Rsvp | null>(null);
+  const [manual, setManual] = useState(false);
   const toast = useToast();
   const confirm = useConfirm();
 
@@ -77,7 +79,7 @@ export default function RsvpPage() {
     downloadText(
       `rsvp-${new Date().toISOString().slice(0, 10)}.csv`,
       toCsv(
-        filtered.map((r) => ({ ...r, status: LABEL[r.attendance], category: r.guests?.category ?? "", via: r.guest_id ? "Kode tamu" : r.source === "admin" ? "Admin" : "Tautan nama", time: new Date(r.updated_at).toLocaleString("id-ID") })),
+        filtered.map((r) => ({ ...r, status: LABEL[r.attendance], category: r.guests?.category ?? "", via: r.source === "admin" ? "Dicatat admin" : r.guest_id ? "Kode tamu" : "Tautan nama", time: new Date(r.updated_at).toLocaleString("id-ID") })),
         [
           { key: "name", label: "nama" },
           { key: "category", label: "kategori" },
@@ -102,6 +104,10 @@ export default function RsvpPage() {
             <Link href="/admin/settings" className="inline-flex min-h-[40px] items-center rounded-md border border-admin-line bg-white px-4 text-sm font-medium hover:bg-[#F0EEE8]">
               Atur batas waktu
             </Link>
+            <Button variant="primary" onClick={() => setManual(true)}>
+              <Plus className="h-4 w-4" aria-hidden="true" />
+              Catat RSVP manual
+            </Button>
             <Button onClick={exportCsv} disabled={!filtered.length}>
               <Download className="h-4 w-4" aria-hidden="true" />
               Export CSV
@@ -157,6 +163,7 @@ export default function RsvpPage() {
                   {r.message && <p className="mt-1 text-sm text-admin-muted">&ldquo;{r.message}&rdquo;</p>}
                   <p className="mt-1 text-xs text-admin-muted">
                     {r.guests?.category ?? "Tautan nama"} · {new Date(r.updated_at).toLocaleString("id-ID")}
+                    {r.source === "admin" && " · dicatat admin"}
                   </p>
                 </div>
                 <div className="flex gap-1">
@@ -172,6 +179,7 @@ export default function RsvpPage() {
           </ul>
         )}
       </Card>
+      <ManualRsvpDialog open={manual} onClose={() => setManual(false)} onSaved={load} />
       {edit && <EditRsvp r={edit} onClose={() => setEdit(null)} onSaved={(n) => { setRows((l) => l!.map((x) => (x.id === n.id ? { ...x, ...n } : x))); setEdit(null); }} />}
     </>
   );

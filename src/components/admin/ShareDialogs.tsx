@@ -25,7 +25,7 @@ export function CopyInline({ text, label = "Salin" }: { text: string; label?: st
   );
 }
 
-export function QrDialog({ open, onClose, link, name }: { open: boolean; onClose: () => void; link: string; name: string }) {
+export function QrDialog({ open, onClose, link, name, shortUrl }: { open: boolean; onClose: () => void; link: string; name: string; shortUrl?: string }) {
   const [src, setSrc] = useState<string | null>(null);
   useEffect(() => {
     if (!open) return;
@@ -49,6 +49,12 @@ export function QrDialog({ open, onClose, link, name }: { open: boolean; onClose
       {/* eslint-disable-next-line @next/next/no-img-element */}
       {src ? <img src={src} alt={`QR code menuju ${link}`} width={320} height={320} className="mx-auto h-auto w-full max-w-[320px]" /> : <div className="mx-auto aspect-square w-full max-w-[320px] animate-pulse bg-[#eee]" />}
       <p className="mt-3 break-all text-center text-xs text-admin-muted">{link}</p>
+      {shortUrl && (
+        <div className="mt-3 flex items-center justify-center gap-2">
+          <p className="break-all text-center text-sm font-medium">{shortUrl.replace(/^https?:\/\//, "")}</p>
+          <CopyInline text={shortUrl} label="Salin tautan pendek" />
+        </div>
+      )}
     </Dialog>
   );
 }

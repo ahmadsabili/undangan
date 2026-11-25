@@ -168,19 +168,19 @@ export default function OverviewPage() {
   );
 }
 
-type GuestLite = { event_ids: string[] | null; invitation_status: string; opened_at: string | null; checked_in_at: string | null; checked_in_pax: number | null; rsvps: { attendance: string; pax: number } | null };
+type GuestLite = { invite_type?: string; event_ids: string[] | null; invitation_status: string; opened_at: string | null; checked_in_at: string | null; checked_in_pax: number | null; rsvps: { attendance: string; pax: number } | null };
 
 // Kartu tambahan yang hanya tampil bila fiturnya aktif.
 function FeatureCards() {
   const { features } = useFeatures();
   const { events } = useEventsList();
   const [guests, setGuests] = useState<GuestLite[] | null>(null);
-  const any = features && (features.sessions || features.open_tracking || features.checkin);
+  const any = features && (features.sessions || features.open_tracking || features.checkin || features.physical);
   useEffect(() => {
     if (!any) return;
     db()
       .from("guests")
-      .select("event_ids, invitation_status, opened_at, checked_in_at, checked_in_pax, rsvps(attendance, pax)")
+      .select("*, rsvps(attendance, pax)")
       .then(({ data }) => setGuests((data as unknown as GuestLite[]) ?? []));
   }, [any]);
   if (!features || !any) return null;
@@ -240,6 +240,29 @@ function FeatureCards() {
           <p className="mt-3 text-sm text-admin-muted">
             {sent.length - opened} tamu belum membuka. Filter <em>Terkirim, belum dibuka</em> di Daftar Tamu untuk mengirim pengingat.
           </p>
+        </Card>
+      )}
+      {features.physical && (
+        <Card title="Jenis undangan" description="Undangan fisik dihitung terkirim setelah ditandai di Daftar Tamu">
+          <ul className="space-y-2 text-sm">
+            {(
+              [
+                ["digital", "Digital"],
+                ["fisik", "Fisik"],
+                ["keduanya", "Keduanya"],
+              ] as const
+            ).map(([k, l]) => {
+              const list = guests.filter((g) => (g.invite_type ?? "digital") === k);
+              return (
+                <li key={k} className="flex justify-between">
+                  <span>{l}</span>
+                  <span className="tabular-nums text-admin-muted">
+                    {list.length} tamu · {list.filter((g) => g.invitation_status === "terkirim").length} terkirim · {list.filter((g) => g.rsvps).length} RSVP
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
         </Card>
       )}
       {features.checkin && (

@@ -182,6 +182,7 @@ export interface FeatureFlags {
   sessions: boolean;
   open_tracking: boolean;
   checkin: boolean;
+  physical: boolean;
 }
 
-export const DEFAULT_FEATURES: FeatureFlags = { sessions: false, open_tracking: false, checkin: false };
+export const DEFAULT_FEATURES: FeatureFlags = { sessions: false, open_tracking: false, checkin: false, physical: false };

@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CalendarRange, Download, FileUp, Link2, MessageCircle, Pencil, Plus, QrCode, Search, Trash2 } from "lucide-react";
+import { CalendarRange, ClipboardCheck, Download, Printer, FileUp, Link2, MessageCircle, Pencil, Plus, QrCode, Search, Trash2 } from "lucide-react";
 import Papa from "papaparse";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -12,6 +12,9 @@ import { useFeatures } from "@/components/admin/useFeatures";
 import { useEventsList, type EventLite } from "@/components/admin/useEventsList";
 import { relativeTime } from "@/lib/date";
 import { DEFAULT_FEATURES } from "@/types/invitation";
+import { ManualRsvpDialog } from "@/components/admin/ManualRsvpDialog";
+import { PrintExportDialog } from "@/components/admin/PrintExportDialog";
+import { shortLink } from "@/lib/print-export";
 import { Badge, Button, Card, Dialog, EmptyState, ErrorState, Field, Input, LoadingBlock, PageHeader, Select, Textarea, useConfirm, useToast } from "@/components/ui";
 import { copyText, downloadText, guestLink, nameLink } from "@/lib/utils";
 import { db, errMessage, toCsv } from "@/services/admin";
@@ -34,7 +37,10 @@ type Guest = {
   open_count?: number;
   checked_in_at?: string | null;
   checked_in_pax?: number | null;
+  invite_type?: "digital" | "fisik" | "keduanya";
 };
+
+const INVITE_LABEL = { digital: "Digital", fisik: "Fisik", keduanya: "Keduanya" } as const;
 
 const RSVP_LABEL = { hadir: "Hadir", tidak_hadir: "Tidak hadir", ragu: "Ragu" } as const;
 const PAGE = 25;
@@ -56,6 +62,8 @@ export default function GuestsPage() {
   const f = features ?? DEFAULT_FEATURES;
   const ev = useEventsList();
   const [bulkOpen, setBulkOpen] = useState(false);
+  const [printOpen, setPrintOpen] = useState(false);
+  const [rsvpFor, setRsvpFor] = useState<Guest | null>(null);
   const toast = useToast();
   const confirm = useConfirm();
   const origin = siteOrigin();
@@ -85,7 +93,9 @@ export default function GuestsPage() {
           (status === "belum_dibuka" && g.invitation_status === "terkirim" && !g.opened_at) ||
           (status === "sudah_dibuka" && g.opened_at) ||
           (status === "sudah_checkin" && g.checked_in_at) ||
-          (status === "belum_checkin" && !g.checked_in_at)),
+          (status === "belum_checkin" && !g.checked_in_at) ||
+          (status === "jenis_digital" && (g.invite_type ?? "digital") === "digital") ||
+          (status === "jenis_fisik" && (g.invite_type === "fisik" || g.invite_type === "keduanya"))),
     );
   }, [guests, q, cat, status]);
   useEffect(() => setPage(0), [q, cat, status]);
@@ -112,6 +122,8 @@ export default function GuestsPage() {
       rsvp: g.rsvps ? RSVP_LABEL[g.rsvps.attendance] : "Belum",
       rsvp_pax: g.rsvps?.pax ?? "",
       acara: g.event_ids?.length ? ev.titles(g.event_ids).join("; ") : "Semua",
+      jenis: INVITE_LABEL[g.invite_type ?? "digital"],
+      tautan_pendek: shortLink(origin, g.code),
       dibuka: g.opened_at ? new Date(g.opened_at).toLocaleString("id-ID") : "",
       checkin: g.checked_in_at ? `${g.checked_in_pax} orang, ${new Date(g.checked_in_at).toLocaleString("id-ID")}` : "",
     }));
@@ -128,6 +140,7 @@ export default function GuestsPage() {
         { key: "rsvp", label: "rsvp" },
         { key: "rsvp_pax", label: "jumlah_hadir" },
         { key: "notes", label: "catatan" },
+        ...(f.physical ? [{ key: "jenis", label: "jenis" }, { key: "tautan_pendek", label: "tautan_pendek" }] : []),
         ...(f.sessions ? [{ key: "acara", label: "acara" }] : []),
         ...(f.open_tracking ? [{ key: "dibuka", label: "dibuka" }] : []),
         ...(f.checkin ? [{ key: "checkin", label: "checkin" }] : []),
@@ -143,6 +156,12 @@ export default function GuestsPage() {
         description="Setiap tamu mendapat tautan berkode unik. Nomor WhatsApp tidak pernah dimasukkan ke tautan."
         actions={
           <>
+            {f.physical && (
+              <Button onClick={() => setPrintOpen(true)} disabled={!guests?.length}>
+                <Printer className="h-4 w-4" aria-hidden="true" />
+                Ekspor untuk cetak
+              </Button>
+            )}
             {f.sessions && (
               <Button onClick={() => setBulkOpen(true)}>
                 <CalendarRange className="h-4 w-4" aria-hidden="true" />
@@ -205,6 +224,8 @@ export default function GuestsPage() {
             {f.open_tracking && <option value="sudah_dibuka">Sudah dibuka</option>}
             {f.checkin && <option value="sudah_checkin">Sudah check-in</option>}
             {f.checkin && <option value="belum_checkin">Belum check-in</option>}
+            {f.physical && <option value="jenis_fisik">Undangan fisik / keduanya</option>}
+            {f.physical && <option value="jenis_digital">Undangan digital saja</option>}
           </Select>
         </div>
 
@@ -227,6 +248,7 @@ export default function GuestsPage() {
                     <th scope="col" className="px-3 py-2 font-medium">Maks</th>
                     <th scope="col" className="px-3 py-2 font-medium">Undangan</th>
                     <th scope="col" className="px-3 py-2 font-medium">RSVP</th>
+                    {f.physical && <th scope="col" className="px-3 py-2 font-medium">Jenis</th>}
                     {f.sessions && <th scope="col" className="px-3 py-2 font-medium">Acara</th>}
                     {f.open_tracking && <th scope="col" className="px-3 py-2 font-medium">Dibuka</th>}
                     {f.checkin && <th scope="col" className="px-3 py-2 font-medium">Check-in</th>}
@@ -246,6 +268,11 @@ export default function GuestsPage() {
                       <td className="px-3 py-2.5">
                         {g.rsvps ? <Badge tone={g.rsvps.attendance === "hadir" ? "ok" : g.rsvps.attendance === "ragu" ? "warn" : "danger"}>{RSVP_LABEL[g.rsvps.attendance]}{g.rsvps.attendance !== "tidak_hadir" ? ` · ${g.rsvps.pax}` : ""}</Badge> : <span className="text-xs text-admin-muted">Belum</span>}
                       </td>
+                      {f.physical && (
+                        <td className="px-3 py-2.5">
+                          <Badge tone={g.invite_type === "digital" || !g.invite_type ? "neutral" : "info"}>{INVITE_LABEL[g.invite_type ?? "digital"]}</Badge>
+                        </td>
+                      )}
                       {f.sessions && (
                         <td className="max-w-[180px] px-3 py-2.5 text-xs">
                           {g.event_ids?.length ? ev.titles(g.event_ids).join(", ") : <span className="text-admin-muted">Semua acara</span>}
@@ -267,6 +294,9 @@ export default function GuestsPage() {
                           </Button>
                           <Button size="icon" variant="ghost" aria-label={`Kirim WhatsApp ke ${g.name}`} onClick={() => setWa(g)}>
                             <MessageCircle className="h-4 w-4" aria-hidden="true" />
+                          </Button>
+                          <Button size="icon" variant="ghost" aria-label={`Catat RSVP ${g.name}`} onClick={() => setRsvpFor(g)}>
+                            <ClipboardCheck className="h-4 w-4" aria-hidden="true" />
                           </Button>
                           <Button size="icon" variant="ghost" aria-label={`Edit ${g.name}`} onClick={() => setEditing(g)}>
                             <Pencil className="h-4 w-4" aria-hidden="true" />
@@ -300,6 +330,7 @@ export default function GuestsPage() {
 
       {editing && (
         <GuestForm
+          physical={f.physical}
           events={f.sessions ? ev.events : []}
           guest={editing === "new" ? null : editing}
           categories={categories}
@@ -310,7 +341,15 @@ export default function GuestsPage() {
           }}
         />
       )}
-      {qr && <QrDialog open onClose={() => setQr(null)} link={guestLink(origin, qr.code)} name={qr.name} />}
+      {qr && <QrDialog open onClose={() => setQr(null)} link={guestLink(origin, qr.code)} name={qr.name} shortUrl={shortLink(origin, qr.code)} />}
+      <ManualRsvpDialog open={Boolean(rsvpFor)} preset={rsvpFor ? { id: rsvpFor.id, name: rsvpFor.name, max_pax: rsvpFor.max_pax } : null} onClose={() => setRsvpFor(null)} onSaved={load} />
+      <PrintExportDialog
+        open={printOpen}
+        onClose={() => setPrintOpen(false)}
+        origin={origin}
+        filtered={filtered.map((g) => ({ name: g.name, code: g.code, category: g.category }))}
+        physicalOnly={(guests ?? []).filter((g) => g.invite_type === "fisik" || g.invite_type === "keduanya").map((g) => ({ name: g.name, code: g.code, category: g.category }))}
+      />
       {wa && (
         <WhatsappDialog
           open
@@ -324,7 +363,7 @@ export default function GuestsPage() {
           onMarkSent={wa.code ? () => markSent(wa) : undefined}
         />
       )}
-      <ImportDialog open={importOpen} onClose={() => setImportOpen(false)} onDone={load} events={f.sessions ? ev.events : []} />
+      <ImportDialog open={importOpen} onClose={() => setImportOpen(false)} onDone={load} events={f.sessions ? ev.events : []} physical={f.physical} />
       {bulkOpen && <BulkEventsDialog categories={categories} events={ev.events} onClose={() => setBulkOpen(false)} onDone={load} />}
     </>
   );
@@ -347,7 +386,8 @@ function CopyIcon({ text }: { text: string }) {
   );
 }
 
-function GuestForm({ guest, categories, onClose, onSaved, events }: { guest: Guest | null; categories: string[]; onClose: () => void; onSaved: (g: Guest) => void; events: EventLite[] }) {
+function GuestForm({ guest, categories, onClose, onSaved, events, physical }: { guest: Guest | null; categories: string[]; onClose: () => void; onSaved: (g: Guest) => void; events: EventLite[]; physical: boolean }) {
+  const [inviteType, setInviteType] = useState<NonNullable<Guest["invite_type"]>>(guest?.invite_type ?? "digital");
   type In = z.input<typeof guestSchema>;
   type Out = z.output<typeof guestSchema>;
   const [eventIds, setEventIds] = useState<string[]>(guest?.event_ids ?? []);
@@ -367,6 +407,7 @@ function GuestForm({ guest, categories, onClose, onSaved, events }: { guest: Gue
       whatsapp: v.whatsapp || null,
       category: v.category || "Umum",
       ...(events.length ? { event_ids: ids.length && ids.length < events.length ? ids : null } : {}),
+      ...(physical ? { invite_type: inviteType } : {}),
     };
     const q = guest ? db().from("guests").update(payload).eq("id", guest.id) : db().from("guests").insert(payload);
     const { data, error } = await q.select("*, rsvps(attendance, pax)").single();
@@ -413,6 +454,15 @@ function GuestForm({ guest, categories, onClose, onSaved, events }: { guest: Gue
             <option value="terkirim">Terkirim</option>
           </Select>
         </Field>
+        {physical && (
+          <Field label="Jenis undangan" htmlFor="g-type" className="sm:col-span-2" help="Fisik atau Keduanya ikut diekspor untuk cetak.">
+            <Select id="g-type" value={inviteType} onChange={(e) => setInviteType(e.target.value as NonNullable<Guest["invite_type"]>)}>
+              <option value="digital">Digital (WhatsApp)</option>
+              <option value="fisik">Fisik (kartu cetak)</option>
+              <option value="keduanya">Keduanya</option>
+            </Select>
+          </Field>
+        )}
         {events.length > 0 && (
           <fieldset className="sm:col-span-2">
             <legend className="text-sm font-medium">Diundang ke acara</legend>
@@ -446,8 +496,8 @@ const pick = (row: Record<string, string>, keys: string[]) => {
   return "";
 };
 
-function ImportDialog({ open, onClose, onDone, events }: { open: boolean; onClose: () => void; onDone: () => void; events: EventLite[] }) {
-  const [rows, setRows] = useState<{ name: string; category: string; whatsapp: string | null; max_pax: number; notes: string; event_ids?: string[] | null }[]>([]);
+function ImportDialog({ open, onClose, onDone, events, physical }: { open: boolean; onClose: () => void; onDone: () => void; events: EventLite[]; physical: boolean }) {
+  const [rows, setRows] = useState<{ name: string; category: string; whatsapp: string | null; max_pax: number; notes: string; event_ids?: string[] | null; invite_type?: string }[]>([]);
   const [problems, setProblems] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
   const input = useRef<HTMLInputElement>(null);
@@ -483,7 +533,15 @@ function ImportDialog({ open, onClose, onDone, events }: { open: boolean; onClos
             bad.push(`Baris ${i + 2}: nama acara tidak dikenali (${acara}). Gunakan judul persis seperti di menu Konten.`);
             return;
           }
-          if (parsed.success) ok.push({ ...parsed.data, whatsapp: parsed.data.whatsapp || null, ...(events.length ? { event_ids: ids.length ? ids : null } : {}) });
+          // Kolom "jenis": digital / fisik / keduanya (kosong = digital).
+          const jenisRaw = pick(r, ["jenis", "jenis_undangan", "tipe"]).toLowerCase();
+          const jenis = !jenisRaw ? "digital" : jenisRaw.startsWith("fis") || jenisRaw.startsWith("cetak") ? "fisik" : jenisRaw.startsWith("kedua") ? "keduanya" : jenisRaw.startsWith("dig") ? "digital" : null;
+          if (physical && !jenis) {
+            bad.push(`Baris ${i + 2}: jenis undangan "${jenisRaw}" tidak dikenal. Pakai digital, fisik, atau keduanya.`);
+            return;
+          }
+          if (parsed.success)
+            ok.push({ ...parsed.data, whatsapp: parsed.data.whatsapp || null, ...(events.length ? { event_ids: ids.length ? ids : null } : {}), ...(physical ? { invite_type: jenis! } : {}) });
           else bad.push(`Baris ${i + 2}: ${parsed.error.issues[0]?.message}`);
         });
         setRows(ok);

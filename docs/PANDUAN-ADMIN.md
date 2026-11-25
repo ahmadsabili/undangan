@@ -104,6 +104,18 @@ Buka **Pengaturan > Fitur tambahan**. Ketiganya bawaan nonaktif dan berlaku lang
 
 **Status "sudah dibuka".** Kolom **Dibuka** muncul di Daftar Tamu. Filter **Terkirim, belum dibuka** untuk mengirim pengingat. Hanya tautan berkode yang tercatat.
 
+**Undangan fisik.**
+1. Aktifkan sakelar **Undangan fisik**. Di Daftar Tamu muncul kolom **Jenis**. Isi lewat Edit tamu, atau kolom `jenis` (digital / fisik / keduanya) saat import CSV.
+2. Klik **Ekspor untuk cetak**, pilih tamu (jenis Fisik & Keduanya, atau sesuai filter), lalu formatnya:
+    - **PDF kartu**: 10 kartu per A4 berisi nama, QR, dan tautan pendek.
+    - **PDF stiker QR**: 24 stiker per A4 untuk ditempel di kartu undangan yang sudah jadi.
+    - **ZIP untuk percetakan**: gambar QR per tamu + `daftar-cetak.csv` untuk mail merge, agar nama dan QR langsung dicetak di kartu.
+3. Cetak satu lembar uji dan pindai QR-nya dengan kamera ponsel sebelum mencetak semuanya. Pastikan `NEXT_PUBLIC_SITE_URL` sudah berisi domain final, karena tautan di kartu tidak bisa diubah setelah dicetak.
+4. Tamu yang tidak bisa memindai QR cukup mengetik tautan pendek seperti `domain-anda/u/K7QW2MNP4X`.
+5. Tandai **Terkirim** setelah kartu diantar.
+
+**RSVP manual.** Tamu yang konfirmasi lewat telepon atau titip pesan: buka **RSVP** > **Catat RSVP manual**, atau klik ikon centang-papan di baris tamu pada Daftar Tamu. RSVP ini masuk ke rekap yang sama dan ditandai *dicatat admin*.
+
 **Check-in hari H.**
 1. Aktifkan fiturnya beberapa hari sebelum acara.
 2. Buat akun untuk tiap penerima tamu: `npm run create-admin -- petugas1@email.com "password" checkin`. Akun petugas hanya bisa membuka halaman check-in.

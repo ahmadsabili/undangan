@@ -234,6 +234,11 @@ const FEATURE_INFO: { key: keyof FeatureFlags; label: string; description: strin
     label: "Check-in hari H dengan QR",
     description: "Petugas penerima tamu memindai QR tamu di halaman /checkin untuk mencatat kehadiran. Akun petugas dibuat dengan npm run create-admin -- email password checkin.",
   },
+  {
+    key: "physical",
+    label: "Undangan fisik",
+    description: "Menambah kolom jenis undangan (digital, fisik, keduanya) di Daftar Tamu dan tombol Ekspor untuk cetak: PDF kartu atau stiker QR, serta paket ZIP untuk percetakan.",
+  },
 ];
 
 function FeatureToggles() {
