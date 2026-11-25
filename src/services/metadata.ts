@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { env } from "@/lib/env";
 import { formatLongDate } from "@/lib/date";
-import { absoluteUrl, getMedia, isRaster } from "@/lib/media";
+import { absoluteUrl, getMedia } from "@/lib/media";
 import { orderedCouple } from "@/services/normalize";
 import type { InvitationData } from "@/types/invitation";
 
@@ -12,13 +12,11 @@ export function invitationMetadata(data: InvitationData): Metadata {
   const title = s.site_title || `The Wedding of ${p1.nickname} & ${p2.nickname}`;
   const date = formatLongDate(s.wedding_date, s.timezone, s.language);
   const description = s.meta_description ? `${date}. ${s.meta_description}` : date;
-  const cover = data.sections.find((x) => x.key === "cover")?.content as { media_id?: string } | undefined;
-  const hero = data.sections.find((x) => x.key === "hero")?.content as { media_id?: string } | undefined;
-  const candidates = [getMedia(data, s.og_media_id), getMedia(data, cover?.media_id), getMedia(data, hero?.media_id)];
-  const photo = candidates.find(isRaster);
-  const image = photo
-    ? { url: absoluteUrl(photo.url, env.siteUrl), width: photo.width ?? 1200, height: photo.height ?? 630, alt: title }
-    : { url: absoluteUrl("/api/og", env.siteUrl), width: 1200, height: 630, alt: title };
+  // Gambar share custom dari admin diutamakan. Selain itu kartu otomatis yang mengikuti
+  // desain undangan; ?v= berubah tiap Publish supaya WhatsApp mengambil gambar baru.
+  // Keduanya disajikan /api/og sebagai JPEG 1200 x 630 (unggahan admin berformat WebP).
+  const version = encodeURIComponent((data.published_at ?? "").replace(/\D/g, "").slice(0, 14) || "1");
+  const image = { url: absoluteUrl(`/api/og?v=${version}`, env.siteUrl), width: 1200, height: 630, alt: title, type: "image/jpeg" };
   const favicon = getMedia(data, s.favicon_media_id);
 
   return {

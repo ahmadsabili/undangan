@@ -172,13 +172,14 @@ export default function SettingsPage() {
             <Field label="Favicon" help="Gambar persegi, minimal 192 x 192 px.">
               <MediaField label="favicon" value={form.favicon_media_id} onChange={(v) => set("favicon_media_id", v)} />
             </Field>
-            <Field label="Gambar share (Open Graph)" help="JPG/PNG/WebP 1200 x 630. Bila kosong, foto cover dipakai.">
+            <Field label="Gambar share (Open Graph)" help="Opsional, 1200 x 630. Bila kosong, kartu otomatis dibuat mengikuti template, warna, font, dan foto sampul undangan.">
               <MediaField label="gambar share" value={form.og_media_id} onChange={(v) => set("og_media_id", v)} />
             </Field>
             <div className="self-center">
               <Switch label="Sembunyikan dari mesin pencari (noindex)" description="Disarankan aktif untuk undangan pribadi." checked={form.noindex} onChange={(v) => set("noindex", v)} />
             </div>
           </div>
+          <OgPreview />
         </Card>
 
         <Card title="Musik latar" description="Gunakan file musik yang Anda punya izin untuk memakainya.">
@@ -308,3 +309,23 @@ const ACCESS_HELP: Record<AccessMode, string> = {
   link: "Alamat utama tanpa tautan tamu menampilkan pesan bahwa undangan bersifat pribadi. Tautan berkode dan tautan cepat ?to=Nama tetap bisa dibuka.",
   code: "Hanya tautan berkode (?guest=KODE atau /u/KODE) dari Daftar Tamu yang bisa dibuka. Tautan cepat ?to=Nama dan kode yang salah ditolak, begitu juga RSVP dan ucapan tanpa kode.",
 };
+
+/** Pratinjau gambar yang muncul saat tautan dibagikan (dari versi yang sudah dipublish). */
+function OgPreview() {
+  const [v, setV] = useState(() => Date.now());
+  return (
+    <div className="mt-6 border-t border-admin-line pt-5">
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <p className="text-sm font-medium">Pratinjau di WhatsApp</p>
+          <p className="text-xs text-admin-muted">Dari versi yang sudah dipublish. Publish dulu setelah mengubah tema, foto, atau gambar share.</p>
+        </div>
+        <Button size="sm" onClick={() => setV(Date.now())}>
+          Muat ulang
+        </Button>
+      </div>
+      {/* eslint-disable-next-line @next/next/no-img-element -- gambar dinamis dari /api/og */}
+      <img src={`/api/og?preview=${v}`} alt="Pratinjau gambar share undangan" width={1200} height={630} className="mt-3 h-auto w-full max-w-xl rounded-md border border-admin-line" />
+    </div>
+  );
+}
