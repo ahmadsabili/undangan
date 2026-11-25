@@ -7,7 +7,7 @@ import { getMedia } from "@/lib/media";
 import { orderedCouple } from "@/services/normalize";
 import type { Section } from "@/types/invitation";
 import { useInvitation } from "../context";
-import { MotifBand, MotifCorners, useLayout } from "../layout";
+import { ArchWindow, DecoCorners, MotifBand, MotifCorners, useLayout } from "../layout";
 import { cn } from "@/lib/utils";
 import { useReducedMotionSafe } from "../useReducedMotionSafe";
 import { Monogram } from "../Monogram";
@@ -24,6 +24,8 @@ export function Cover({ section, onOpen }: { section: Section<CoverContent>; onO
   const [p1, p2] = orderedCouple(s.couple);
   const photo = getMedia(data, c.media_id);
   const light = "rgb(var(--c-on-primary))";
+  const arch = layout === "arch";
+  const bento = layout === "bento";
 
   const item = (i: number) => ({
     initial: m.enabled ? { opacity: 0, y: 14 } : (false as const),
@@ -40,13 +42,23 @@ export function Cover({ section, onOpen }: { section: Section<CoverContent>; onO
       exit={reduce ? { opacity: 0 } : { opacity: 0, y: "-6%", transition: { duration: 1.1, ease: [0.65, 0, 0.35, 1] } }}
     >
       <div className={cn("relative flex w-full flex-1 flex-col overflow-hidden bg-primary", layout === "card" && "mx-auto md:max-w-[460px] md:rounded-[calc(var(--radius)+14px)]")}>
-      {photo && <SmartImage media={photo} sizes={layout === "card" ? "(min-width: 768px) 460px, 100vw" : "100vw"} priority className="scale-[1.02]" />}
-      <div aria-hidden="true" className="absolute inset-0 bg-primary" style={{ opacity: "var(--overlay)" }} />
-      <div
-        aria-hidden="true"
-        className="absolute inset-0"
-        style={{ background: "linear-gradient(180deg, rgb(var(--c-primary) / 0.15) 0%, rgb(var(--c-primary) / 0.35) 45%, rgb(var(--c-primary) / 0.86) 100%)" }}
-      />
+      {photo && !arch && <SmartImage media={photo} sizes={layout === "card" ? "(min-width: 768px) 460px, 100vw" : "100vw"} priority className="scale-[1.02]" />}
+      {!arch && (
+        <>
+          <div aria-hidden="true" className="absolute inset-0 bg-primary" style={{ opacity: "var(--overlay)" }} />
+          <div
+            aria-hidden="true"
+            className="absolute inset-0"
+            style={{ background: "linear-gradient(180deg, rgb(var(--c-primary) / 0.15) 0%, rgb(var(--c-primary) / 0.35) 45%, rgb(var(--c-primary) / 0.86) 100%)" }}
+          />
+        </>
+      )}
+      {arch && <div aria-hidden="true" className="absolute inset-0" style={{ background: "radial-gradient(120% 70% at 50% 0%, rgb(var(--c-accent) / 0.22), transparent 60%)" }} />}
+      {layout === "deco" && (
+        <div aria-hidden="true" className="pointer-events-none absolute inset-4 border sm:inset-7" style={{ borderColor: "rgb(var(--c-on-primary) / 0.35)" }}>
+          <DecoCorners inset={-1} size={54} color="rgb(var(--c-on-primary) / 0.8)" />
+        </div>
+      )}
 
       {layout === "classic" && (
         <div aria-hidden="true" className="pointer-events-none absolute inset-3 border p-[5px] sm:inset-6" style={{ borderColor: "rgb(var(--c-on-primary) / 0.55)" }}>
@@ -63,16 +75,25 @@ export function Cover({ section, onOpen }: { section: Section<CoverContent>; onO
 
       <div className="relative flex flex-1 flex-col items-center px-8 pb-safe pt-[max(2.5rem,env(safe-area-inset-top))] text-center" style={{ color: light }}>
         <motion.div {...item(0)}>
-          <Monogram size={78} />
+          {arch && photo ? (
+            <ArchWindow className="mt-2 aspect-[3/4] h-[min(42dvh,420px)]" color="rgb(var(--c-on-primary))">
+              <SmartImage media={photo} sizes="320px" priority />
+            </ArchWindow>
+          ) : (
+            <Monogram size={78} />
+          )}
         </motion.div>
 
-        <div className="mt-auto w-full max-w-md">
+        <div
+          className={cn("mt-auto w-full max-w-md", bento && "mb-4 rounded-[calc(var(--radius)+18px)] border px-6 pt-7 backdrop-blur-md")}
+          style={bento ? { background: "rgb(var(--c-primary) / 0.4)", borderColor: "rgb(var(--c-on-primary) / 0.18)" } : undefined}
+        >
           <motion.p {...item(1)} className="font-body text-[0.72rem] font-medium tracking-[0.22em]">
             {c.eyebrow || "The Wedding of"}
           </motion.p>
           <motion.h1 {...item(2)} id="cover-names" className="mt-3 font-heading text-[3.3rem] font-normal leading-[0.95] sm:text-7xl">
             {p1.nickname}
-            <span className="mx-3 font-heading italic text-[0.8em] align-middle" style={{ color: "rgb(var(--c-secondary))" }}>
+            <span className="mx-3 font-heading italic text-[0.8em] align-middle" style={{ color: "rgb(var(--c-soft-on-primary))" }}>
               &amp;
             </span>
             {p2.nickname}

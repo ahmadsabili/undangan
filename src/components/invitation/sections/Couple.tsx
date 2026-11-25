@@ -9,7 +9,7 @@ import { useInvitation } from "../context";
 import { Reveal } from "../Reveal";
 import { SectionFrame } from "../SectionFrame";
 import { SmartImage } from "../SmartImage";
-import { useLayout } from "../layout";
+import { ArchWindow, DecoWindow, useLayout } from "../layout";
 
 function Profile({ person, offset }: { person: Person; offset?: boolean }) {
   const { data, t } = useInvitation();
@@ -19,7 +19,19 @@ function Profile({ person, offset }: { person: Person; offset?: boolean }) {
   const ig = person.instagram.replace(/^@/, "").trim();
   return (
     <div className={cn("text-center", offset && layout === "editorial" && "md:mt-28")}>
-      {photo && (
+      {photo && (layout === "deco" || layout === "arch") ? (
+        <Reveal variant="image">
+          {layout === "deco" ? (
+            <DecoWindow className="mx-auto aspect-[3/4] w-[62%] max-w-[260px]">
+              <SmartImage media={photo} sizes="(min-width: 768px) 260px, 62vw" alt={photo.alt || person.full_name} />
+            </DecoWindow>
+          ) : (
+            <ArchWindow className="mx-auto aspect-[3/4] w-[66%] max-w-[280px]">
+              <SmartImage media={photo} sizes="(min-width: 768px) 280px, 66vw" alt={photo.alt || person.full_name} />
+            </ArchWindow>
+          )}
+        </Reveal>
+      ) : photo && (
         <Reveal variant="image">
           <div
             className={cn(
@@ -28,15 +40,16 @@ function Profile({ person, offset }: { person: Person; offset?: boolean }) {
               (layout === "classic" || layout === "nusantara") && "aspect-[3/4] w-[62%] max-w-[260px] rounded-[50%] border-[3px] border-double",
               layout === "cinematic" && "aspect-square w-[56%] max-w-[240px] rounded-full border-2",
               card && "aspect-square w-[88%] rounded-full",
+              layout === "bento" && "aspect-[4/5] w-[78%] max-w-[320px] border-0",
             )}
-            style={{ borderColor: "rgb(var(--c-accent) / 0.7)" }}
+            style={{ borderColor: "rgb(var(--c-accent) / 0.7)", borderRadius: layout === "bento" ? "calc(var(--radius) + 18px)" : undefined }}
           >
             <SmartImage media={photo} sizes={card ? "200px" : "(min-width: 768px) 300px, 68vw"} alt={photo.alt || person.full_name} />
           </div>
         </Reveal>
       )}
       <Reveal delay={0.1}>
-        <h3 className={cn("mt-8 font-heading leading-tight", card ? "mt-5 text-[1.45rem]" : "text-[2rem] sm:text-4xl")}>{person.full_name}</h3>
+        <h3 className={cn("mt-8 font-heading leading-tight", card ? "mt-5 text-[1.45rem]" : layout === "deco" ? "mt-10 text-[1.55rem] uppercase tracking-[0.1em] sm:text-3xl" : "text-[2rem] sm:text-4xl")}>{person.full_name}</h3>
       </Reveal>
       {(person.parent_label || person.parents) && (
         <Reveal delay={0.16}>
@@ -80,7 +93,7 @@ export function Couple({ section, folio }: { section: Section<{ connector?: stri
         className={cn(
           "mx-auto grid max-w-5xl items-start",
           card ? "grid-cols-[1fr_auto_1fr] gap-2" : "gap-10 md:grid-cols-[1fr_auto_1fr] md:gap-6",
-          layout === "classic" || layout === "nusantara" ? "md:items-center" : "",
+          ["classic", "nusantara", "deco", "arch"].includes(layout) ? "md:items-center" : "",
         )}
       >
         <Profile person={p1} />

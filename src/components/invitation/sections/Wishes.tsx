@@ -105,8 +105,8 @@ export function Wishes({ section, folio }: { section: Section<Content>; folio: n
   return (
     <SectionFrame section={section} folio={folio} align="left">
       <ReadablePanel className="mx-auto max-w-5xl">
-      <div className={cn("mx-auto grid gap-14", layout === "editorial" ? "max-w-5xl md:grid-cols-12" : "max-w-2xl")}>
-        <form onSubmit={submit} noValidate className={cn("space-y-5 text-left", layout === "editorial" && "md:col-span-5")}>
+      <div className={cn("mx-auto grid gap-14", (layout === "editorial" || layout === "bento") ? "max-w-5xl md:grid-cols-12" : "max-w-2xl")}>
+        <form onSubmit={submit} noValidate className={cn("space-y-5 text-left", (layout === "editorial" || layout === "bento") && "md:col-span-5")}>
           <div>
             <label htmlFor="wish-name" className="mb-2 block font-body text-sm font-medium">
               {t.wishName}
@@ -138,7 +138,7 @@ export function Wishes({ section, folio }: { section: Section<Content>; folio: n
           </InvButton>
         </form>
 
-        <div className={cn("text-left", layout === "editorial" && "md:col-span-7")} aria-live="polite">
+        <div className={cn("text-left", (layout === "editorial" || layout === "bento") && "md:col-span-7")} aria-live="polite">
           {state === "loading" && (
             <ul className="space-y-6" aria-label="Memuat ucapan">
               {[0, 1, 2].map((i) => (

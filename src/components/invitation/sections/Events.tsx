@@ -8,7 +8,7 @@ import { useInvitation } from "../context";
 import { InvLink } from "../InvButton";
 import { Reveal } from "../Reveal";
 import { SectionFrame } from "../SectionFrame";
-import { MotifCorners, useLayout } from "../layout";
+import { DecoCorners, MotifCorners, useLayout } from "../layout";
 import { cn } from "@/lib/utils";
 
 type Content = { dress_code?: string; guest_rules?: string; notes?: string };
@@ -83,17 +83,27 @@ export function Events({ section, folio }: { section: Section<Content>; folio: n
                   as="li"
                   key={e.id}
                   delay={i * 0.08}
-                  className={cn("relative border px-6 text-center", card ? "py-8 text-left" : "py-10 sm:px-10")}
-                  style={{ borderColor: "rgb(var(--c-accent) / 0.55)", borderRadius: "var(--radius)", background: layout === "cinematic" ? "rgb(var(--c-primary) / 0.35)" : undefined }}
+                  className={cn(
+                    "relative border px-6 text-center",
+                    card ? "py-8 text-left" : "py-10 sm:px-10",
+                    layout === "arch" && "pt-20 sm:pt-24",
+                    layout === "bento" && "border-0 py-9 text-left sm:px-9",
+                  )}
+                  style={{
+                    borderColor: "rgb(var(--c-accent) / 0.55)",
+                    borderRadius: layout === "arch" ? "999px 999px var(--radius) var(--radius)" : layout === "bento" ? "calc(var(--radius) + 14px)" : "var(--radius)",
+                    background: layout === "cinematic" ? "rgb(var(--c-primary) / 0.35)" : layout === "bento" ? "rgb(var(--c-secondary) / 0.6)" : undefined,
+                  }}
                 >
                   {layout === "nusantara" && <MotifCorners inset={6} size={30} />}
-                  <h3 className={cn("font-heading leading-tight", card ? "text-[1.9rem]" : "text-[2.2rem] sm:text-5xl")}>{e.title}</h3>
+                  {layout === "deco" && <DecoCorners inset={-1} size={30} />}
+                  <h3 className={cn("font-heading leading-tight", card ? "text-[1.9rem]" : layout === "deco" ? "text-[1.7rem] uppercase tracking-[0.1em] sm:text-4xl" : "text-[2.2rem] sm:text-5xl")}>{e.title}</h3>
                   <p className="mt-3 font-body text-[0.95rem]" style={{ color: "rgb(var(--tone-accent))" }}>
                     {formatPlainDate(e.event_date, s.language)}
                   </p>
                   <p className="mt-1 font-body text-[0.95rem] tabular-nums">{time}</p>
                   {(e.venue_name || e.address) && (
-                    <div className={cn("mt-5 font-body leading-relaxed", !card && "mx-auto max-w-sm")}>
+                    <div className={cn("mt-5 font-body leading-relaxed", !card && layout !== "bento" && "mx-auto max-w-sm")}>
                       {e.venue_name && <p className="font-medium">{e.venue_name}</p>}
                       {e.address && <p style={{ color: "rgb(var(--tone-muted))" }}>{e.address}</p>}
                     </div>

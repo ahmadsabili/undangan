@@ -6,6 +6,7 @@ import { Badge, Button, Card, ErrorState, Field, Input, LoadingBlock, PageHeader
 import { FONT_OPTIONS, googleFontsHref } from "@/config/fonts";
 import { BACKGROUND_OPTIONS, SECTION_META } from "@/config/sections";
 import { LAYOUTS } from "@/config/layouts";
+import { BUILTIN_PRESETS, PALETTE_GROUPS, PALETTES } from "@/config/palettes";
 import { LayoutSketch } from "@/components/admin/LayoutSketch";
 import { MediaField } from "@/components/admin/MediaPicker";
 import { contrastWarnings, normalizeTheme, toneFor } from "@/lib/theme";
@@ -62,7 +63,11 @@ export default function ThemePage() {
     setSlug(st.theme_slug);
     setBgs(b);
     setSaved({ theme: t, slug: st.theme_slug, bgs: b });
-    setPresets(p.data as Preset[]);
+    // Preset bawaan aplikasi ditambahkan setelah preset database (tanpa duplikat slug).
+    const fromDb = p.data as Preset[];
+    const builtin = BUILTIN_PRESETS.filter((b) => !fromDb.some((x) => x.slug === b.slug)).map((b) => ({ ...b, id: `builtin-${b.slug}`, is_preset: true }));
+    const custom = fromDb.filter((x) => !x.is_preset);
+    setPresets([...fromDb.filter((x) => x.is_preset), ...builtin, ...custom]);
     setSections(sec.data as Section[]);
   }, []);
   useEffect(() => {
@@ -200,7 +205,43 @@ export default function ThemePage() {
 
         <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
           <div className="grid gap-6">
-            <Card title="Warna">
+            <Card title="Warna" description="Pilih palet siap pakai, lalu sesuaikan tiap warna bila perlu. Palet hanya mengganti warna; font dan gaya tetap.">
+              <div className="space-y-4">
+                {PALETTE_GROUPS.map((g) => (
+                  <div key={g.key}>
+                    <p className="text-xs font-medium tracking-wide text-admin-muted">{g.label}</p>
+                    <ul className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-4">
+                      {PALETTES.filter((x) => x.group === g.key).map((pal) => {
+                        const active = (Object.keys(pal.colors) as (keyof ThemeTokens["colors"])[]).every((k) => pal.colors[k].toUpperCase() === theme.colors[k].toUpperCase());
+                        return (
+                          <li key={pal.slug}>
+                            <button
+                              type="button"
+                              aria-pressed={active}
+                              onClick={() => {
+                                setTheme({ ...theme, colors: { ...pal.colors } });
+                                setSlug(null);
+                              }}
+                              className={cn("w-full rounded-md border p-2 text-left transition-colors", active ? "border-admin-brand ring-2 ring-admin-brand/20" : "border-admin-line hover:border-admin-muted")}
+                            >
+                              <span className="flex overflow-hidden rounded">
+                                {(["background", "secondary", "accent", "primary", "text"] as const).map((k) => (
+                                  <span key={k} className="h-5 flex-1" style={{ background: pal.colors[k] }} />
+                                ))}
+                              </span>
+                              <span className="mt-1.5 flex items-center justify-between text-xs font-medium">
+                                {pal.name}
+                                {active && <Check className="h-3.5 w-3.5" aria-hidden="true" />}
+                              </span>
+                            </button>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+              <p className="mb-3 mt-6 text-xs font-medium tracking-wide text-admin-muted">Atur manual</p>
               <div className="grid gap-4 sm:grid-cols-2">
                 {COLOR_LABELS.map(([k, label, help]) => (
                   <Field key={k} label={label} htmlFor={`c-${k}`} help={help}>

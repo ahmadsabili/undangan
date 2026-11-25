@@ -42,8 +42,8 @@ Website undangan pernikahan satu halaman dengan dashboard admin. Seluruh konten,
 - Login aman (Supabase Auth), tanpa registrasi publik, ganti password.
 - Ringkasan statistik: tamu, RSVP per status, estimasi orang hadir, per kategori, aktivitas terbaru.
 - Editor konten berbasis form, drag and drop urutan section, aktif/nonaktif, draft & publish, reset.
-- **5 template tata letak**: Editorial, Klasik Simetris, Sinematik Foto Penuh, Kartu Minimal, Tradisional Nusantara (ornamen bisa diganti). Dipilih di menu Tema dan bisa dipadukan dengan preset warna mana pun.
-- Editor tema: 6 preset warna (Modern Elegant, Classic Luxury, Botanical Garden, Minimalist Monochrome, Romantic Champagne, Editorial Wedding), warna, font, ukuran huruf, radius, gaya tombol & navigasi, intensitas animasi, overlay foto, latar per section, cek kontras otomatis.
+- **8 template tata letak**: Editorial, Klasik Simetris, Sinematik Foto Penuh, Kartu Minimal, Tradisional Nusantara (ornamen bisa diganti), Art Deco Mewah, Lengkung Modern, Bento Modern. Dipilih di menu Tema dan bisa dipadukan dengan preset warna mana pun.
+- Editor tema: 16 preset (6 dari database + 10 bawaan aplikasi, termasuk tema gelap Noir Deco, Emerald Royale, Bordeaux Luxe, Midnight Glam), 20 palet warna cepat (netral, pastel, gelap mewah), warna, font, ukuran huruf, radius, gaya tombol & navigasi, intensitas animasi, overlay foto, latar per section, cek kontras otomatis.
 - Media library: upload banyak file, kompresi WebP, alt text, titik fokus, ganti file tanpa merusak referensi, penghapusan aman.
 - Daftar tamu: CRUD, cari, filter, import/export CSV, tautan berkode unik, QR code, pesan WhatsApp siap kirim.
 - **Tautan pendek** `/u/KODE` untuk kartu cetak (selalu aktif) dan **RSVP manual oleh admin** untuk konfirmasi lewat telepon.

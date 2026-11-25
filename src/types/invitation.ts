@@ -51,7 +51,7 @@ export interface Couple {
   order: "first_second" | "second_first";
 }
 
-export type LayoutKey = "editorial" | "classic" | "cinematic" | "card" | "nusantara";
+export type LayoutKey = "editorial" | "classic" | "cinematic" | "card" | "nusantara" | "deco" | "arch" | "bento";
 
 export interface ThemeTokens {
   layout: LayoutKey; // template tata letak

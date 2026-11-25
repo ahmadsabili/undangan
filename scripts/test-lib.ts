@@ -3,7 +3,9 @@ import assert from "node:assert/strict";
 import { zonedToUtc, utcToZonedInput, zonedInputToIso, formatPlainDate, formatTime } from "../src/lib/date.ts";
 import { buildIcs, googleCalendarUrl } from "../src/lib/calendar.ts";
 import { cleanText, spamReason, sanitizeSvg } from "../src/lib/sanitize.ts";
-import { contrastRatio, ensureContrast, toneFor, DEFAULT_THEME } from "../src/lib/theme.ts";
+import { contrastRatio, ensureContrast, toneFor, DEFAULT_THEME, contrastWarnings, buttonColors } from "../src/lib/theme.ts";
+import { PALETTES, BUILTIN_PRESETS } from "../src/config/palettes.ts";
+import { FONT_OPTIONS } from "../src/config/fonts.ts";
 
 let n = 0;
 const t = (name: string, fn: () => void) => {
@@ -55,6 +57,25 @@ t("tone semua latar section terbaca", () => {
     assert.ok(contrastRatio(tone.ink, tone.bg) >= 7, `${bg} ink`);
     assert.ok(contrastRatio(tone.muted, tone.bg) >= 4.5, `${bg} muted`);
     assert.ok(contrastRatio(tone.accentInk, tone.bg) >= 4.5, `${bg} accent`);
+  }
+});
+
+t("semua palet warna lolos cek kontras dan tombol terlihat", () => {
+  for (const p of PALETTES) {
+    const theme = { ...DEFAULT_THEME, colors: p.colors };
+    for (const w of contrastWarnings(theme)) assert.ok(w.ok, `${p.slug}: ${w.label} ${w.ratio.toFixed(2)}`);
+    for (const bg of ["background", "secondary", "surface", "primary"] as const) {
+      const tone = toneFor(theme, bg);
+      const b = buttonColors(theme, tone.bg, bg === "primary");
+      assert.ok(contrastRatio(b.bg, tone.bg) >= 1.8, `${p.slug}/${bg}: tombol menyatu dengan latar`);
+      assert.ok(contrastRatio(b.fg, b.bg) >= 4.5, `${p.slug}/${bg}: teks tombol kurang kontras`);
+    }
+  }
+});
+
+t("preset bawaan memakai font yang tersedia", () => {
+  for (const b of BUILTIN_PRESETS) {
+    for (const k of ["heading", "body", "accent"] as const) assert.ok(FONT_OPTIONS.some((f) => f.family === b.tokens.fonts[k] && f.category === k), `${b.slug}: ${b.tokens.fonts[k]}`);
   }
 });
 

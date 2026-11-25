@@ -71,7 +71,7 @@ export function Gallery({ section, folio }: { section: Section<Content>; folio: 
       <div className="mx-auto max-w-6xl">
         {items.length === 0 ? (
           <p style={{ color: "rgb(var(--tone-muted))" }}>Foto akan segera ditambahkan.</p>
-        ) : layout === "editorial" ? (
+        ) : layout === "editorial" || layout === "bento" ? (
           <ul className="grid grid-flow-dense grid-cols-2 gap-2 [grid-auto-rows:9.5rem] sm:gap-3 md:grid-cols-4 md:[grid-auto-rows:13rem]">
             {items.map((g, i) => (
               <Reveal
@@ -85,7 +85,7 @@ export function Gallery({ section, folio }: { section: Section<Content>; folio: 
                   type="button"
                   onClick={() => setOpen(i)}
                   className="group relative block h-full w-full overflow-hidden"
-                  style={{ borderRadius: "var(--radius)" }}
+                  style={{ borderRadius: layout === "bento" ? "calc(var(--radius) + 14px)" : "var(--radius)" }}
                   aria-label={`${t.photo} ${i + 1}${g.caption ? `: ${g.caption}` : ""}`}
                 >
                   <SmartImage media={g.media} sizes="(min-width: 768px) 25vw, 50vw" className="transition-transform duration-700 ease-silk group-hover:scale-[1.03]" />
@@ -112,11 +112,11 @@ export function Gallery({ section, folio }: { section: Section<Content>; folio: 
                 <button
                   type="button"
                   onClick={() => setOpen(i)}
-                  className={cn("group relative block aspect-square w-full overflow-hidden", layout !== "card" && "border p-1")}
-                  style={{ borderRadius: "var(--radius)", borderColor: "rgb(var(--c-accent) / 0.5)" }}
+                  className={cn("group relative block w-full overflow-hidden", layout === "arch" ? "aspect-[3/4]" : "aspect-square", layout !== "card" && "border p-1")}
+                  style={{ borderRadius: layout === "arch" ? "999px 999px var(--radius) var(--radius)" : "var(--radius)", borderColor: "rgb(var(--c-accent) / 0.5)" }}
                   aria-label={`${t.photo} ${i + 1}${g.caption ? `: ${g.caption}` : ""}`}
                 >
-                  <span className="relative block h-full w-full overflow-hidden" style={{ borderRadius: "var(--radius)" }}>
+                  <span className="relative block h-full w-full overflow-hidden" style={{ borderRadius: layout === "arch" ? "999px 999px var(--radius) var(--radius)" : "var(--radius)" }}>
                     <SmartImage media={g.media} sizes="(min-width: 768px) 33vw, 50vw" className="transition-transform duration-700 ease-silk group-hover:scale-[1.03]" />
                   </span>
                 </button>

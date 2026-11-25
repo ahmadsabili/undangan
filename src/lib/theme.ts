@@ -23,7 +23,7 @@ export const DEFAULT_THEME: ThemeTokens = {
 
 export function normalizeTheme(t: Partial<ThemeTokens> | null | undefined): ThemeTokens {
   const src = t ?? {};
-  const layouts = ["editorial", "classic", "cinematic", "card", "nusantara"];
+  const layouts = ["editorial", "classic", "cinematic", "card", "nusantara", "deco", "arch", "bento"];
   return {
     ...DEFAULT_THEME,
     ...src,
@@ -88,11 +88,16 @@ export interface ToneSet {
   rule: string;
 }
 
+/** Warna teks dasar di atas primary: latar (tema terang) atau teks (tema gelap), mana yang lebih kontras. */
+function baseOnPrimary(c: ThemeTokens["colors"]) {
+  return contrastRatio(c.background, c.primary) >= contrastRatio(c.text, c.primary) ? c.background : c.text;
+}
+
 /** Warna teks yang terbaca untuk setiap pilihan latar section. */
 export function toneFor(theme: ThemeTokens, bg: SectionBackground): ToneSet {
   const c = theme.colors;
   const bgHex = bg === "primary" ? c.primary : bg === "secondary" ? c.secondary : bg === "surface" ? c.surface : c.background;
-  const ink = bg === "primary" ? ensureContrast(c.background, bgHex, 7) : ensureContrast(c.text, bgHex, 7);
+  const ink = bg === "primary" ? ensureContrast(baseOnPrimary(c), bgHex, 7) : ensureContrast(c.text, bgHex, 7);
   const muted = ensureContrast(toHex(mix(hexToRgb(ink), hexToRgb(bgHex), 0.3)), bgHex, 4.6, ink);
   const accentInk = ensureContrast(c.accent, bgHex, 4.5, bg === "primary" ? "#FFFFFF" : c.text);
   return { bg: bgHex, ink, muted, accentInk, rule: c.accent };
@@ -100,7 +105,9 @@ export function toneFor(theme: ThemeTokens, bg: SectionBackground): ToneSet {
 
 export function themeStyle(theme: ThemeTokens): CSSProperties {
   const c = theme.colors;
-  const onPrimary = ensureContrast(c.background, c.primary, 4.5);
+  const onPrimary = ensureContrast(baseOnPrimary(c), c.primary, 4.5);
+  // Aksen lembut di atas primary (ampersand sampul): secondary bila cukup kontras, selain itu aksen.
+  const softOnPrimary = contrastRatio(c.secondary, c.primary) >= 3 ? c.secondary : ensureContrast(c.accent, c.primary, 3);
   const accentInk = ensureContrast(c.accent, c.background, 4.5, c.text);
   const vars: Record<string, string> = {
     "--c-primary": rgbVar(c.primary),
@@ -111,6 +118,7 @@ export function themeStyle(theme: ThemeTokens): CSSProperties {
     "--c-text": rgbVar(c.text),
     "--c-on-primary": rgbVar(onPrimary),
     "--c-accent-ink": rgbVar(accentInk),
+    "--c-soft-on-primary": rgbVar(softOnPrimary),
     "--font-heading": `"${theme.fonts.heading}"`,
     "--font-body": `"${theme.fonts.body}"`,
     "--font-accent": `"${theme.fonts.accent}"`,
@@ -135,13 +143,36 @@ export function motionScale(level: ThemeTokens["animation"]) {
   }
 }
 
+/** Latar kanvas Bento: latar utama digeser sedikit ke warna teks agar tiap ubin terlihat. */
+export function bentoCanvas(theme: ThemeTokens) {
+  const c = theme.colors;
+  return toHex(mix(hexToRgb(c.background), hexToRgb(c.text), 0.07));
+}
+
+/** Warna tombol solid yang tetap terlihat di latar mana pun, termasuk tema gelap. */
+export function buttonColors(theme: ThemeTokens, bgHex: string, onPrimarySection: boolean) {
+  const c = theme.colors;
+  // Di tema gelap, tombol emas/aksen lebih terbaca dan terasa mewah.
+  let bg = luminance(hexToRgb(c.background)) < 0.2 ? c.accent : onPrimarySection ? c.background : c.primary;
+  if (contrastRatio(bg, bgHex) < 1.8) bg = c.accent;
+  if (contrastRatio(bg, bgHex) < 1.8) bg = luminance(hexToRgb(bgHex)) > 0.4 ? c.text : "#FFFFFF";
+  const preferred = onPrimarySection ? c.primary : toneFor(theme, "primary").ink;
+  const fg = contrastRatio(preferred, bg) >= 4.5 ? preferred : ensureContrast(luminance(hexToRgb(bg)) > 0.4 ? c.text : c.background, bg, 4.5);
+  return { bg, fg };
+}
+
+export function isDarkTheme(theme: ThemeTokens) {
+  return luminance(hexToRgb(theme.colors.background)) < 0.2;
+}
+
 export function contrastWarnings(theme: ThemeTokens) {
   const c = theme.colors;
+  const onPrimary = Math.max(contrastRatio(c.background, c.primary), contrastRatio(c.text, c.primary));
   const checks: { label: string; ratio: number; min: number }[] = [
     { label: "Teks di atas latar", ratio: contrastRatio(c.text, c.background), min: 4.5 },
     { label: "Teks di atas surface", ratio: contrastRatio(c.text, c.surface), min: 4.5 },
     { label: "Teks di atas secondary", ratio: contrastRatio(c.text, c.secondary), min: 4.5 },
-    { label: "Latar di atas primary (teks terang)", ratio: contrastRatio(c.background, c.primary), min: 4.5 },
+    { label: "Teks di atas primary", ratio: onPrimary, min: 4.5 },
   ];
   return checks.map((x) => ({ ...x, ok: x.ratio >= x.min }));
 }

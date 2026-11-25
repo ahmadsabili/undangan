@@ -58,6 +58,46 @@ export function LayoutSketch({ layout, colors }: { layout: LayoutKey; colors: Th
           <ellipse cx="80" cy="60" rx="13" ry="16" fill={c.secondary} stroke={c.accent} />
         </svg>
       );
+    case "deco":
+      return (
+        <svg {...common} aria-label="Sketsa Art Deco Mewah">
+          <rect width="160" height="100" fill={c.background} />
+          <rect x="22" y="5" width="116" height="90" fill="none" stroke={c.accent} />
+          <path d="M22 17 V5 H34 M26 17 V9 H34 M138 17 V5 H126 M134 17 V9 H126 M22 83 V95 H34 M138 83 V95 H126" fill="none" stroke={c.accent} />
+          {[-50, -25, 0, 25, 50].map((r) => (
+            <line key={r} x1="80" y1="24" x2={80 + Math.sin((r * Math.PI) / 180) * 12} y2={24 - Math.cos((r * Math.PI) / 180) * 12} stroke={c.accent} />
+          ))}
+          <rect x="52" y="28" width="56" height="5" rx="1" fill={c.text} opacity="0.85" />
+          {line(64, 37, 32, 0.4)}
+          <path d="M66 90 V54 H70 V50 H76 V47 H84 V50 H90 V54 H94 V90 Z" fill={c.secondary} stroke={c.accent} />
+        </svg>
+      );
+    case "arch":
+      return (
+        <svg {...common} aria-label="Sketsa Lengkung Modern">
+          <rect width="160" height="100" fill={c.background} />
+          <path d="M64 64 V30 A16 16 0 0 1 96 30 V64 Z" fill="none" stroke={c.accent} transform="translate(3 3)" />
+          <path d="M64 64 V30 A16 16 0 0 1 96 30 V64 Z" fill={c.secondary} />
+          <rect x="56" y="70" width="48" height="7" rx="2" fill={c.text} opacity="0.85" />
+          <rect x="62" y="82" width="36" height="8" rx="4" fill="none" stroke={c.text} opacity="0.5" />
+          <path d="M12 92 V70 A10 10 0 0 1 32 70 V92 Z M128 92 V70 A10 10 0 0 1 148 70 V92 Z" fill="none" stroke={c.accent} opacity="0.6" />
+        </svg>
+      );
+    case "bento":
+      return (
+        <svg {...common} aria-label="Sketsa Bento Modern">
+          <rect width="160" height="100" fill={c.secondary} />
+          <rect x="6" y="6" width="84" height="88" rx="8" fill={c.background} />
+          <rect x="6" y="6" width="84" height="88" rx="8" fill={c.primary} opacity="0.22" />
+          <rect x="95" y="6" width="59" height="56" rx="8" fill={c.primary} />
+          <rect x="101" y="30" width="34" height="6" rx="2" fill={c.background} opacity="0.9" />
+          <rect x="101" y="40" width="26" height="6" rx="2" fill={c.background} opacity="0.9" />
+          <rect x="95" y="67" width="34" height="27" rx="8" fill={c.background} />
+          {line(100, 78, 22, 0.7)}
+          <rect x="134" y="67" width="20" height="27" rx="8" fill={c.background} />
+          <rect x="140" y="77" width="8" height="8" transform="rotate(45 144 81)" fill="none" stroke={c.accent} />
+        </svg>
+      );
     default:
       return (
         <svg {...common} aria-label="Sketsa Editorial">

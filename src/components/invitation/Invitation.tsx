@@ -3,7 +3,7 @@
 import { AnimatePresence, MotionConfig } from "framer-motion";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getMedia } from "@/lib/media";
-import { motionScale, themeStyle } from "@/lib/theme";
+import { bentoCanvas, motionScale, themeStyle } from "@/lib/theme";
 import { cn } from "@/lib/utils";
 import type { GuestContext, InvitationData, Section } from "@/types/invitation";
 import { BottomNav } from "./BottomNav";
@@ -115,6 +115,7 @@ export function Invitation({
     [scoped, guest, mode, s.language, theme.animation, photos],
   );
   const card = theme.layout === "card";
+  const bento = theme.layout === "bento";
 
   useEffect(() => {
     document.documentElement.lang = s.language;
@@ -164,7 +165,7 @@ export function Invitation({
   return (
     <InvitationContext.Provider value={ctx}>
       <MotionConfig reducedMotion="user">
-        <div data-layout={theme.layout} className={card ? "min-h-[100dvh] bg-secondary font-body text-ink md:py-10" : "min-h-[100dvh] bg-bg font-body text-ink"} style={themeStyle(theme)}>
+        <div data-layout={theme.layout} className={card ? "min-h-[100dvh] bg-secondary font-body text-ink md:py-10" : "min-h-[100dvh] bg-bg font-body text-ink"} style={bento ? { ...themeStyle(theme), backgroundColor: bentoCanvas(theme) } : themeStyle(theme)}>
           <AnimatePresence>{!showContent && cover && <Cover key="cover" section={cover} onOpen={open} />}</AnimatePresence>
 
           <main
@@ -173,8 +174,10 @@ export function Invitation({
             inert={!showContent || undefined}
             className={cn(
               card && "mx-auto w-full max-w-[460px] overflow-hidden bg-bg md:rounded-[calc(var(--radius)+14px)] md:shadow-[0_24px_60px_rgb(0_0_0/0.12)]",
+              // Bento: tiap section menjadi ubin membulat dengan celah di antaranya.
+              bento && "mx-auto grid w-full max-w-[1360px] gap-3 px-3 pt-3 sm:gap-4 sm:px-5 sm:pt-5",
               // Ruang untuk navigasi bawah, kecuali bila section penutup (yang sudah berpadding) ada di akhir.
-              visible[visible.length - 1]?.key !== "closing" && "pb-24",
+              visible[visible.length - 1]?.key !== "closing" ? "pb-24" : bento && "pb-3 sm:pb-5",
             )}
           >
             {visible.map((section) => renderSection(section, folios[section.id], saveTheDateHref))}

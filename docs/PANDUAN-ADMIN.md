@@ -67,8 +67,12 @@ Tips per section:
 | Sinematik Foto Penuh | Punya banyak foto prewedding bagus. Atur foto latar tiap section di menu Konten |
 | Kartu Minimal | Ringkas dan rapi, tampil seperti kartu di desktop |
 | Tradisional Nusantara | Nuansa adat. Motif kawung bawaan bisa diganti gambar ornamen sendiri |
+| Art Deco Mewah | Kesan glamor dan formal. Paling bagus dengan tema gelap seperti Noir Deco atau Emerald Royale |
+| Lengkung Modern | Gaya kekinian dengan foto berbentuk lengkung. Cocok dengan palet pastel |
+| Bento Modern | Tampilan ubin seperti aplikasi modern, rapi di ponsel maupun desktop |
 
-- Pilih salah satu dari 6 preset. Konten tidak berubah sama sekali.
+- Pilih salah satu preset (warna + font + gaya). Konten tidak berubah sama sekali.
+- Di kartu **Warna**, klik salah satu **palet cepat** untuk mengganti warna saja tanpa mengubah font. Ada palet netral, pastel, dan gelap mewah. Semua palet sudah dicek kontrasnya.
 - Atur warna, font, ukuran huruf, sudut, gaya tombol, navigasi, animasi, dan kegelapan overlay foto.
 - Daftar **cek kontras** memberi peringatan bila kombinasi warna sulit dibaca.
 - **Simpan ke daftar preset** menyimpan kombinasi Anda sebagai tema custom.

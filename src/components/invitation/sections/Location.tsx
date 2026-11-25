@@ -78,7 +78,7 @@ export function Location({ section, folio }: { section: Section<Content>; folio:
   return (
     <SectionFrame section={section} folio={folio}>
       <div className="mx-auto max-w-5xl">
-        <div className={cn("grid items-center gap-10", layout === "editorial" && "md:grid-cols-2 md:gap-16")}>
+        <div className={cn("grid items-center gap-10", (layout === "editorial" || layout === "bento") && "md:grid-cols-2 md:gap-16")}>
           {photo && (
             <Reveal variant="image">
               <div className="relative aspect-[4/3] overflow-hidden" style={{ borderRadius: "var(--radius)" }}>
@@ -86,7 +86,7 @@ export function Location({ section, folio }: { section: Section<Content>; folio:
               </div>
             </Reveal>
           )}
-          <div className={layout === "editorial" && photo ? "text-left" : layout === "card" ? "text-left" : "mx-auto max-w-xl text-center md:col-span-2"}>
+          <div className={(layout === "editorial" || layout === "bento") && photo ? "text-left" : layout === "card" ? "text-left" : "mx-auto max-w-xl text-center md:col-span-2"}>
             <Reveal>
               <h3 className="font-heading text-4xl leading-tight sm:text-5xl">{c.venue_name}</h3>
             </Reveal>
