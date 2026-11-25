@@ -25,6 +25,11 @@ export function Cover({ section, onOpen }: { section: Section<CoverContent>; onO
   const photo = getMedia(data, c.media_id);
   const light = "rgb(var(--c-on-primary))";
   const arch = layout === "arch";
+  // Panjang nama menentukan tata letak: sejajar bila pendek, ditumpuk bila panjang.
+  const longest = Math.max(p1.nickname.length, p2.nickname.length);
+  const total = p1.nickname.length + p2.nickname.length;
+  const stack = total > 8;
+  const stackWide = total > 16;
   const bento = layout === "bento";
 
   const item = (i: number) => ({
@@ -91,12 +96,21 @@ export function Cover({ section, onOpen }: { section: Section<CoverContent>; onO
           <motion.p {...item(1)} className="font-body text-[0.72rem] font-medium tracking-[0.22em]">
             {c.eyebrow || "The Wedding of"}
           </motion.p>
-          <motion.h1 {...item(2)} id="cover-names" className="mt-3 font-heading text-[3.3rem] font-normal leading-[0.95] sm:text-7xl">
-            {p1.nickname}
-            <span className="mx-3 font-heading italic text-[0.8em] align-middle" style={{ color: "rgb(var(--c-soft-on-primary))" }}>
+          <motion.h1
+            {...item(2)}
+            id="cover-names"
+            className={cn(
+              "mt-3 flex items-center justify-center font-heading font-normal leading-[0.95]",
+              // Nama panjang ditumpuk agar tetap di tengah dan tidak meluber ke kanan.
+              !stack ? "flex-row flex-wrap" : stackWide ? "flex-col" : "flex-col sm:flex-row",
+              longest > 9 ? "text-[2.7rem] sm:text-6xl" : "text-[3.3rem] sm:text-7xl",
+            )}
+          >
+            <span className="max-w-full break-words">{p1.nickname}</span>
+            <span className={cn("font-heading italic text-[0.8em]", !stack ? "mx-3" : stackWide ? "my-1" : "my-1 sm:mx-3 sm:my-0")} style={{ color: "rgb(var(--c-soft-on-primary))" }}>
               &amp;
             </span>
-            {p2.nickname}
+            <span className="max-w-full break-words">{p2.nickname}</span>
           </motion.h1>
           <motion.p {...item(3)} className="mt-4 font-body text-sm tracking-[0.16em] tabular-nums">
             {formatShortDate(s.wedding_date, s.timezone, s.language)}
