@@ -149,3 +149,27 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+@layer base {
+  /* Admin di ponsel: isi grid boleh menyusut (teks panjang dipotong, bukan
+     melebarkan halaman). Penting di Safari/Chrome iOS. */
+  .admin .grid > * {
+    min-width: 0;
+  }
+  .admin input,
+  .admin select,
+  .admin textarea {
+    min-width: 0;
+    max-width: 100%;
+  }
+  /* Input tanggal/jam iOS punya lebar bawaan yang tidak ikut w-full. */
+  .admin input[type="date"],
+  .admin input[type="datetime-local"],
+  .admin input[type="time"] {
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .admin input::-webkit-date-and-time-value {
+    text-align: left;
+  }
+}
