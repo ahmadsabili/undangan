@@ -187,7 +187,7 @@ export default function SettingsPage() {
             <div className="md:col-span-2">
               <Switch label="Aktifkan musik" description="Musik mulai setelah tamu menekan Buka Undangan dan bisa dimatikan kapan saja." checked={form.music_enabled} onChange={(v) => set("music_enabled", v)} />
             </div>
-            <Field label="File musik (MP3/M4A, maks 15 MB)">
+            <Field label="File musik (MP3/M4A, maks 15 MB)" help="Disarankan di bawah 8 MB (MP3 128 kbps). File di bawah 10 MB diputar lewat cache Vercel sehingga tidak menghabiskan kuota Supabase.">
               <MediaField label="musik" kind="audio" value={form.music_media_id} onChange={(v) => set("music_media_id", v)} />
             </Field>
             <Field label={`Volume awal: ${Math.round(form.music_volume * 100)}%`} htmlFor="vol">

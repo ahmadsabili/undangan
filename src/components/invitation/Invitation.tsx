@@ -184,7 +184,7 @@ export function Invitation({
           </main>
 
           {showContent && <BottomNav sections={visible} />}
-          {musicFile && <MusicPlayer ref={music} src={musicFile.url} volume={s.music_volume} />}
+          {musicFile && <MusicPlayer ref={music} src={musicFile.url} cachedSrc={mode === "public" && /^https?:\/\//.test(musicFile.url) ? `/api/media/music/${musicFile.id}` : undefined} volume={s.music_volume} />}
         </div>
       </MotionConfig>
     </InvitationContext.Provider>

@@ -1,7 +1,7 @@
 "use client";
 
 import { Disc3, Pause } from "lucide-react";
-import { forwardRef, useImperativeHandle, useRef, useState } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { useInvitation } from "./context";
 
 export interface MusicHandle {
@@ -10,14 +10,54 @@ export interface MusicHandle {
 
 const PREF = "music-pref"; // "on" | "off", dipertahankan selama sesi
 
-export const MusicPlayer = forwardRef<MusicHandle, { src: string; volume: number }>(function MusicPlayer({ src, volume }, ref) {
+/**
+ * src: alamat asli di Supabase (cadangan). cachedSrc: alamat lewat CDN Vercel.
+ * File diunduh dari CDN sebagai blob sejak sampul tampil, supaya pemutaran tidak
+ * memakan kuota egress Supabase dan tetap lancar di iPhone (blob tidak butuh Range).
+ */
+export const MusicPlayer = forwardRef<MusicHandle, { src: string; cachedSrc?: string; volume: number }>(function MusicPlayer({ src, cachedSrc, volume }, ref) {
   const { t } = useInvitation();
   const audio = useRef<HTMLAudioElement>(null);
   const [playing, setPlaying] = useState(false);
+  const [blobUrl, setBlobUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!cachedSrc) return;
+    let url: string | null = null;
+    let cancelled = false;
+    const ctrl = new AbortController();
+    // Tunda sedikit agar tidak berebut bandwidth dengan foto sampul.
+    const timer = window.setTimeout(async () => {
+      try {
+        const res = await fetch(cachedSrc, { signal: ctrl.signal });
+        if (!res.ok) return;
+        const blob = await res.blob();
+        if (cancelled) return;
+        url = URL.createObjectURL(blob);
+        setBlobUrl(url);
+      } catch {
+        /* tetap memakai src asli */
+      }
+    }, 1200);
+    return () => {
+      cancelled = true;
+      ctrl.abort();
+      window.clearTimeout(timer);
+      if (url) URL.revokeObjectURL(url);
+    };
+  }, [cachedSrc]);
+
+  // Ganti sumber ke blob bila sudah siap dan musik belum diputar.
+  useEffect(() => {
+    const a = audio.current;
+    if (!a || !blobUrl || !a.paused || a.src === blobUrl) return;
+    a.src = blobUrl;
+  }, [blobUrl]);
 
   async function play() {
     const a = audio.current;
     if (!a) return;
+    if (!a.getAttribute("src")) a.src = blobUrl ?? src;
     a.volume = Math.min(Math.max(volume, 0), 1);
     try {
       await a.play();
@@ -56,7 +96,7 @@ export const MusicPlayer = forwardRef<MusicHandle, { src: string; volume: number
 
   return (
     <>
-      <audio ref={audio} src={src} loop preload="none" onPause={() => setPlaying(false)} onPlay={() => setPlaying(true)} />
+      <audio ref={audio} loop preload="none" onPause={() => setPlaying(false)} onPlay={() => setPlaying(true)} />
       <button
         type="button"
         onClick={toggle}
