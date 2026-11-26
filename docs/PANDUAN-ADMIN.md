@@ -120,6 +120,8 @@ Buka **Pengaturan > Fitur tambahan**. Ketiganya bawaan nonaktif dan berlaku lang
 
 **RSVP manual.** Tamu yang konfirmasi lewat telepon atau titip pesan: buka **RSVP** > **Catat RSVP manual**, atau klik ikon centang-papan di baris tamu pada Daftar Tamu. RSVP ini masuk ke rekap yang sama dan ditandai *dicatat admin*.
 
+**Backup otomatis.** Seminggu sekali sistem menyimpan salinan konfigurasi, tamu, RSVP, dan ucapan. Lihat di menu **Backup & Restore** > **Backup otomatis**: unduh file, atau klik **Buat backup sekarang** sebelum perubahan besar. Untuk memulihkan, pilih file yang diunduh di kartu **Restore**: konfigurasi dipulihkan ke draft, dan tombol **Kembalikan tamu, RSVP, dan ucapan yang terhapus** menambahkan kembali data yang sempat terhapus tanpa mengubah data yang masih ada. Sesekali simpan salinannya di luar Supabase, misalnya Google Drive.
+
 **Undangan pribadi.** Di Pengaturan > Fitur tambahan, atur **Siapa yang bisa membuka undangan**:
 - *Semua orang yang punya alamat undangan* (bawaan).
 - *Hanya lewat tautan tamu*: alamat utama tanpa `?guest=` atau `?to=` menampilkan pesan "Undangan ini bersifat pribadi".

@@ -162,6 +162,25 @@ await check("situs offline menyembunyikan snapshot", async () => {
   assert.equal(r.rows[0].s, null);
   await db.exec("update public.wedding_settings set is_published = true");
 });
+await check("backup otomatis: hanya service role, berisi tamu, dan bisa memulihkan tamu terhapus", async () => {
+  await assert.rejects(as("authenticated", ADMIN, () => db.query("select public.backup_snapshot()")));
+  await assert.rejects(as("anon", null, () => db.query("select public.backup_snapshot()")));
+  const snap = (await as("service_role", null, () => db.query("select public.backup_snapshot() as b"))).rows[0].b;
+  assert.equal(snap.kind, "auto-backup");
+  assert.ok(snap.config.sections && snap.guests.length >= 1);
+  const exp = await as("authenticated", ADMIN, () => db.query("select public.export_config() as e"));
+  assert.ok(exp.rows[0].e.sections);
+  const victim = snap.guests[0];
+  await db.exec(`delete from public.guests where id = '${victim.id}'`);
+  const r = await as("authenticated", ADMIN, () => db.query("select public.restore_deleted_records($1::jsonb) as n", [JSON.stringify(snap)]));
+  assert.equal(r.rows[0].n.guests, 1);
+  const back = await db.query(`select code from public.guests where id = '${victim.id}'`);
+  assert.equal(back.rows[0].code, victim.code);
+  const again = await as("authenticated", ADMIN, () => db.query("select public.restore_deleted_records($1::jsonb) as n", [JSON.stringify(snap)]));
+  assert.equal(again.rows[0].n.guests, 0);
+  await assert.rejects(as("authenticated", VIEWER, () => db.query("select public.restore_deleted_records($1::jsonb)", [JSON.stringify(snap)])));
+});
+
 await check("mode akses pribadi: anon tidak bisa mengambil konten, service role bisa", async () => {
   await db.exec(`update public.wedding_settings set features = features || '{"access": "code"}'`);
   const anon = await as("anon", null, () => db.query("select public.get_published_invitation() as s"));
